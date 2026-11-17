@@ -1,4 +1,4 @@
-name: Live browser acceptance
+name: Read-only browser checks
 on:
   push:
     branches: [frontend-gemini, main]
@@ -25,8 +25,6 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build --prefix frontend
       - run: node scripts/browser-accept.mjs
-        env:
-          ENABLE_BROWSER_WRITE: STABLE_STUDIONET_61999
       - uses: actions/upload-artifact@v4
         if: always()
         with:

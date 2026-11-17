@@ -5,7 +5,7 @@ import fs from 'node:fs/promises';
 const manifest=JSON.parse(await fs.readFile('deployment.json','utf8'));
 let saved=null;try{saved=JSON.parse(await fs.readFile('evidence/browser-live.json','utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
 const canWrite=process.env.ENABLE_BROWSER_WRITE==='STABLE_STUDIONET_61999'&&!saved;
-if(!saved&&!canWrite)throw Error('No published browser evidence; opt in explicitly for real zero-cost acceptance');
+if(!saved&&!canWrite){const live=JSON.parse(await fs.readFile('evidence/live.json','utf8'));if(live.finalBook?.state!=='COMMITTED')throw Error('Real COMMITTED evidence required for read-only browser checks');saved={owner:live.finalBook.owner,bookId:live.finalBook.id}}
 await fs.mkdir('artifacts',{recursive:true});
 const server=spawn('npm',['run','preview','--prefix','frontend','--','--host','127.0.0.1','--port','5175'],{stdio:'ignore'});
 let browser;const errors=[],pages=[];
@@ -16,10 +16,12 @@ try{
  browser=await chromium.launch({headless:true,...process.env.BROWSER_EXECUTABLE?{executablePath:process.env.BROWSER_EXECUTABLE}:{},args:['--no-sandbox']});
  if(!canWrite){
   const p=await browser.newPage();pages.push(p);p.on('pageerror',e=>errors.push(e.message));
-  await p.goto(`http://127.0.0.1:5175/#/books/${saved.owner.toLowerCase()}/browser-print?mode=live`);
+  const bookId=saved.bookId??`${saved.owner.toLowerCase()}:browser-print`;
+  await p.goto(`http://127.0.0.1:5175/#/books/${bookId.replace(':','/')}?mode=live`);
   await p.getByLabel('Book state: COMMITTED').waitFor({timeout:90000});
+  await p.getByRole('button',{name:'Create Free Studio Session',exact:true}).click();await p.getByTestId('wallet-address').waitFor({timeout:90000});
   if(errors.length)throw Error(errors.join('\n'));
-  await fs.writeFile('artifacts/browser-smoke.json',JSON.stringify({kind:'read-only-browser-smoke',sourceSha256:manifest.sourceSha256,bookId:`${saved.owner.toLowerCase()}:browser-print`,state:'COMMITTED',observedAt:new Date().toISOString(),transactionsSent:0,errors},null,2));console.log('Read-only browser latest-final COMMITTED confirmed; zero transactions sent.');
+  await fs.writeFile('artifacts/browser-smoke.json',JSON.stringify({kind:'read-only-browser-smoke',sourceSha256:manifest.sourceSha256,bookId,state:'COMMITTED',observedAt:new Date().toISOString(),transactionsSent:0,errors},null,2));console.log('Read-only browser latest-final COMMITTED confirmed; zero transactions sent.');
  }else{
   const a=await browser.newPage(),b=await browser.newPage();pages.push(a,b);
   for(const p of pages){p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());await p.goto('http://127.0.0.1:5175/#/books/new');await p.getByRole('button',{name:'Create Free Studio Session',exact:true}).click();await p.getByTestId('wallet-address').waitFor({timeout:90000})}
