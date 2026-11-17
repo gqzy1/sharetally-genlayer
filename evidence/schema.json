@@ -2,8 +2,8 @@
   "kind": "read-only-rpc-schema-compilation",
   "chainId": 61999,
   "rpc": "https://studio.genlayer.com/api",
-  "sourceSha256": "0cf60ea7b2dac5a6e25713e889965cf5b6acf22b3d4252932a4c44e779192aae",
-  "observedAt": "2026-11-17T17:13:18.552Z",
+  "sourceSha256": "b5a98d59a3cea8a31829268b264e9bb284138021754e22a8e9bb0a67da16a135",
+  "observedAt": "2026-11-17T21:17:17.085Z",
   "schema": {
     "ctor": {
       "params": [],

@@ -68,3 +68,11 @@ frontend/
 ```
 
 A static React/TypeScript application is sufficient; no central backend or frontend LLM integration. Use compact tables on desktop and readable cards on narrow screens. Keyboard operation, visible focus, accessible validation and reduced-motion support are required. Large monetary-looking amounts must retain the displayed currency and 2-decimal minor-unit explanation.
+
+## Live release behavior
+
+The application imports the root manifest rather than maintaining a second address. Live catalogue and book routes require a verified source and always read `latest-final`; `?mode=offline` is the explicit example namespace. A live lookup error clears its data and cannot select a fixture.
+
+`WalletProvider` uses `sdk/client.ts` for EIP-1193 network switching, source checks, zero-cost writes and verified readback. A separate ephemeral Studio session signer is available for public test quotations. Session private keys never enter local storage, source, evidence or logs. Member addresses are displayed in full before sealing; each member controls its own signing wallet.
+
+The live operation journal persists a SUBMITTING marker before broadcast, saves returned hashes immediately, and blocks another operation for the same book while an outcome is unresolved. A failed storage write stops signing. An unreadable journal also fails closed before a new write. After a timeout, reload or account change, the transaction page resumes the recorded hash using a read-only client. ACCEPTED remains provisional; VERIFIED requires the SDK's finality, execution, consensus, intent-binding and latest-final readback checks. A surviving unknown-broadcast marker requires wallet-history reconciliation.

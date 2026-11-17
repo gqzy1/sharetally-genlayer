@@ -1,0 +1,27 @@
+{
+  "kind": "actual-local-validation",
+  "sourceSha256": "b5a98d59a3cea8a31829268b264e9bb284138021754e22a8e9bb0a67da16a135",
+  "recordedAt": "2026-11-17T21:35:37.731971+00:00",
+  "backendPython": {
+    "passed": 12,
+    "failed": 0,
+    "evidence": "contract-tests.txt"
+  },
+  "sdk": {
+    "passed": 11,
+    "failed": 0,
+    "evidence": "sdk-tests.txt"
+  },
+  "frontend": {
+    "passed": 25,
+    "failed": 0,
+    "evidence": "frontend-tests.txt"
+  },
+  "rootTypecheck": "passed",
+  "frontendTypecheck": "passed",
+  "productionBuild": "passed",
+  "buildWarning": "SDK bundle exceeds Vite 500kB chunk advisory; build succeeds.",
+  "genvmCheck": "passed; advisory I200 newer runner available",
+  "liveAcceptance": "13 business operations plus deployment; actual receipts in receipts/",
+  "readOnlyReverification": "passed; source-verification.json"
+}

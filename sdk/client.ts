@@ -1,6 +1,6 @@
 import {createClient,abi} from 'genlayer-js';
 import {studionet} from 'genlayer-js/chains';
-import {TransactionHashVariant} from 'genlayer-js/types';
+import {TransactionHashVariant,transactionsStatusNumberToName} from 'genlayer-js/types';
 import type {Address, Book, PendingWrite, Specification, TxHash, TxPhase, VerifiedWrite, WriteIntent} from './types.js';
 import {ShareTallyError} from './types.js';
 
@@ -19,11 +19,19 @@ export function readClient():Client{return createClient({chain:studionet,endpoin
 export async function assertNetwork(client:Client):Promise<void>{
   if(studionet.id!==CHAIN_ID || await client.getChainId()!==CHAIN_ID)fail('WRONG_NETWORK','Stable Studionet 61999 required');
 }
+/** Stable Studio is free; fail closed if the RPC starts quoting a fee. */
+export async function assertZeroCost(client:Client):Promise<void>{
+  await assertNetwork(client);
+  const gasPrice = await client.request({method:'eth_gasPrice'});
+  if(BigInt(gasPrice as string)!==0n)fail('REJECTED','Network requires payment; no transaction sent');
+}
 export function guardedProvider(provider:NonNullable<Provider>,signer:Address):NonNullable<Provider>{
   return new Proxy(provider, {get(target,property){
     if(property==='request')return async (request:Parameters<typeof provider.request>[0])=>{
       if(['eth_sendTransaction','eth_signTransaction','personal_sign','eth_signTypedData_v4'].includes(request.method)){
         if(Number(await target.request({method:'eth_chainId'}))!==CHAIN_ID)fail('WRONG_NETWORK','Wallet moved off Stable Studionet');
+        const tx=(request.params as Record<string,unknown>[]|undefined)?.[0];
+        if(request.method==='eth_sendTransaction' && (!tx || BigInt(String(tx.value??0))!==0n || BigInt(String(tx.gasPrice??-1))!==0n))fail('REJECTED','Only explicit zero-cost transactions are permitted');
         const accounts=await target.request({method:'eth_accounts'}) as string[];
         if(lower(accounts[0])!==lower(signer))fail('SIGNER_CHANGED','Wallet account changed before signing');
       }
@@ -38,7 +46,7 @@ export async function connectWallet(provider: NonNullable<Provider>):Promise<{cl
   catch(e){
     if(obj(e).code!==4902)throw e;
     await provider.request({method:'wallet_addEthereumChain',params:[{chainId:'0xf22f',chainName:'GenLayer Stable Studionet',
-      nativeCurrency:studionet.nativeCurrency,rpcUrls:[RPC],blockExplorerUrls:['https://explorer-studio.genlayer.com']}]});
+      nativeCurrency:studionet.nativeCurrency,rpcUrls:[RPC],blockExplorerUrls:[studionet.blockExplorers!.default.url]}]});
     await provider.request({method:'wallet_switchEthereumChain',params:[{chainId:'0xf22f'}]});
   }
   if(Number(await provider.request({method:'eth_chainId'}))!==CHAIN_ID)fail('WRONG_NETWORK','Wallet network differs');
@@ -59,7 +67,7 @@ export async function listBooks(client:Client,contract:Address,owner:Address):Pr
   if(!Array.isArray(ids)||ids.some(id=>typeof id!=='string'))return fail('BAD_RESPONSE','Invalid book catalogue');
   return ids as string[];
 }
-export async function verifySource(client:Client,contract:Address,expectedSha256:string):Promise<void>{
+export async function verifySource(client:Client,contract:Address,expectedSha256:string):Promise<string>{
   await assertNetwork(client);
   if(!/^0x[0-9a-fA-F]{40}$/.test(contract)||/^0x0{40}$/i.test(contract))fail('NOT_DEPLOYED','No deployed contract configured');
   if(!/^[0-9a-f]{64}$/.test(expectedSha256))fail('SOURCE_MISMATCH','Missing release source hash');
@@ -68,6 +76,7 @@ export async function verifySource(client:Client,contract:Address,expectedSha256
   const bytes=new TextEncoder().encode(code);
   const actual=Array.from(new Uint8Array(await globalThis.crypto.subtle.digest('SHA-256',bytes))).map(v=>v.toString(16).padStart(2,'0')).join('');
   if(actual!==expectedSha256)fail('SOURCE_MISMATCH','Deployed bytes differ from this release');
+  return actual;
 }
 export function argsFor(intent:WriteIntent):(string|number)[]{
   switch(intent.method){
@@ -76,9 +85,15 @@ export function argsFor(intent:WriteIntent):(string|number)[]{
     default:return [intent.bookId,intent.revision];
   }
 }
+export function receiptStatus(raw:unknown):string{
+  const r=obj(raw),named=r.statusName,value=r.status;
+  const mapped=transactionsStatusNumberToName[String(value) as keyof typeof transactionsStatusNumberToName];
+  if(typeof named==='string'&&mapped&&named!==mapped)fail('UNVERIFIED_RECEIPT','Conflicting receipt statuses');
+  return typeof named==='string'?named:mapped??String(value);
+}
 export function checkFinalReceipt(raw:unknown,hash:TxHash):void{
   const r=obj(raw);
-  if((r.statusName??r.status)!=='FINALIZED')fail('UNVERIFIED_RECEIPT','Receipt is not FINALIZED',hash);
+  if(receiptStatus(r)!=='FINALIZED')fail('UNVERIFIED_RECEIPT','Receipt is not FINALIZED',hash);
   if(lower(r.hash??r.txId)!==lower(hash))fail('UNVERIFIED_RECEIPT','Receipt hash differs',hash);
   if('txExecutionResultName' in r){
     if(r.txExecutionResultName!=='FINISHED_WITH_RETURN')fail('TX_FAILED','Execution failed',hash);
@@ -90,7 +105,7 @@ export function checkFinalReceipt(raw:unknown,hash:TxHash):void{
     const leaders=Array.isArray(consensus.leader_receipt)?consensus.leader_receipt.map(obj).filter(v=>v.mode==='leader'):[];
     const leader=leaders.at(-1);
     if(!leader || leader.execution_result!=='SUCCESS')fail('TX_FAILED','Leader execution failed or absent',hash);
-    if(r.result!==6 && r.resultName!=='MAJORITY_AGREE')fail('CONSENSUS_FAILED','Majority agreement missing',hash);
+    if((r.result!==undefined && r.result!==6) || (r.resultName!==undefined && r.resultName!=='MAJORITY_AGREE') || (r.result===undefined && r.resultName===undefined))fail('CONSENSUS_FAILED','Majority agreement missing',hash);
     if(r.leader_only!==false || r.execution_mode!=='NORMAL')fail('UNVERIFIED_RECEIPT','Full consensus missing',hash);
   }
 }
@@ -102,7 +117,11 @@ export function receiptCall(raw:unknown):Record<string,unknown>{
   try{return obj(abi.calldata.decode(Uint8Array.from(atob(encoded),c=>c.charCodeAt(0))))}catch{return {}}
 }
 export function checkReceipt(raw:unknown,pending:PendingWrite):void{
-  const r=obj(raw);checkFinalReceipt(r,pending.hash);
+  checkFinalReceipt(raw,pending.hash);checkIntentBinding(raw,pending);
+}
+export function checkIntentBinding(raw:unknown,pending:PendingWrite):void{
+  const r=obj(raw);
+  if(lower(r.hash??r.txId)!==lower(pending.hash))fail('UNVERIFIED_RECEIPT','Receipt hash differs',pending.hash);
   if(lower(r.from_address??r.sender)!==lower(pending.signer)||lower(r.to_address??r.recipient)!==lower(pending.contract))
     fail('UNVERIFIED_RECEIPT','Receipt signer or destination differs',pending.hash);
   if(r.value!==undefined && String(r.value)!=='0')fail('UNVERIFIED_RECEIPT','Unexpected attached value',pending.hash);
@@ -147,6 +166,7 @@ export class ShareTallyApi {
     const frozen=structuredClone(intent);
     try{
       await verifySource(this.client,this.contract,this.sourceSha256);
+      await assertZeroCost(this.client);
       const accounts=await this.client.getAddresses();
       if(lower(accounts[0])!==lower(this.signer))fail('SIGNER_CHANGED','Reconnect the selected wallet');
       onPhase('AWAITING_SIGNATURE');
@@ -163,7 +183,7 @@ export class ShareTallyApi {
     while(Date.now()-started<timeoutMs){
       // Transport failures bubble up with pending preserved by the caller. Never resubmit here.
       const receipt=await this.client.getTransaction({hash:pending.hash as import('genlayer-js/types').TransactionHash});
-      const status=receipt.statusName??receipt.status;
+      const status=receiptStatus(receipt);
       if(status==='FINALIZED'){
         checkReceipt(receipt,pending);onPhase('READING_BACK');
         const book=await this.getBook(pending.bookId);checkReadback(book,pending);

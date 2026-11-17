@@ -64,8 +64,20 @@ test('wallet guard rechecks the actual provider network and account immediately 
   let chain='0xf22f',account=signer,signed=0;
   const provider={request:async({method}:{method:string})=>method==='eth_chainId'?chain:method==='eth_accounts'?[account]:(signed++,'sent')};
   const guarded=guardedProvider(provider as never,signer);
-  assert.equal(await guarded.request({method:'eth_sendTransaction',params:[]}), 'sent');
-  chain='0x1';await assert.rejects(guarded.request({method:'eth_sendTransaction',params:[]}),/Stable Studionet/);
-  chain='0xf22f';account=contract;await assert.rejects(guarded.request({method:'eth_sendTransaction',params:[]}),/account changed/);
+  assert.equal(await guarded.request({method:'eth_sendTransaction',params:[{value:'0x0',gasPrice:'0x0'}]}), 'sent');
+  chain='0x1';await assert.rejects(guarded.request({method:'eth_sendTransaction',params:[{value:'0x0',gasPrice:'0x0'}]}),/Stable Studionet/);
+  chain='0xf22f';account=contract;await assert.rejects(guarded.request({method:'eth_sendTransaction',params:[{value:'0x0',gasPrice:'0x0'}]}),/account changed/);
   assert.equal(signed,1);
+});
+
+test('SDK numeric receipt status uses official mapping and never promotes ACCEPTED',async()=>{
+ const {checkFinalReceipt,receiptStatus}=await import('../sdk/client.js');
+ const r={...receipt(),statusName:undefined,status:7};assert.equal(receiptStatus(r),'FINALIZED');assert.doesNotThrow(()=>checkFinalReceipt(r,hash));
+ r.status=5;assert.equal(receiptStatus(r),'ACCEPTED');assert.throws(()=>checkFinalReceipt(r,hash));
+ (r as any).statusName='FINALIZED';assert.throws(()=>checkFinalReceipt(r,hash),/Conflicting receipt statuses/);
+});
+test('nonzero gas price stops zero-cost writes',async()=>{
+ const {assertZeroCost}=await import('../sdk/client.js');
+ const client={getChainId:async()=>61999,request:async()=> '0x1'} as unknown as Client;
+ await assert.rejects(assertZeroCost(client),/requires payment/);
 });

@@ -1,0 +1,21 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> sharetally-frontend@1.0.0 build
+> tsc --noEmit && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 981 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.65 kB │ gzip:   0.41 kB
+dist/assets/index-Dbd4CVKL.css     17.11 kB │ gzip:   4.03 kB
+dist/assets/ccip-CKXREGen.js        4.63 kB │ gzip:   2.05 kB
+dist/assets/ccip-ksVUlNAs.js        4.63 kB │ gzip:   2.06 kB
+dist/assets/index-DhwBpEkf.js   1,407.66 kB │ gzip: 334.88 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.80s
