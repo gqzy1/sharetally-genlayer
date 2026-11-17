@@ -21,7 +21,7 @@ No server, database, indexer, private frontend model key, token economics or ext
 
 Create a quote → seal → assess → inspect the entire table → resolve missing terms in a new book if necessary → review exact and rounded shares → each member approves → view and export the committed record. Any member may cancel before commitment. Editing, roster replacement and reassessment of completed findings are deliberately absent; a corrected quote creates a new book.
 
-The first release exposes an undeployed state with local examples. A later deployed release must pass actual on-chain acceptance before the app permits writes. A schema compilation is not that acceptance.
+The current release is deployed on Stable Studionet (chain ID 61999). The published application reads the release manifest and verifies the deployed contract's exact source bytes before enabling writes. Live books and explicitly labelled offline examples remain separate. Deployment and browser acceptance records are retained under `evidence/`; schema compilation alone is not evidence of deployment or acceptance.
 
 ## Acceptance scope
 
