@@ -15,7 +15,7 @@ A quote charging 120 minor units per group plus 30 per participant gives three p
 
 ## Release status
 
-Backend and integration specification only. **Not deployed.** There is no configured contract address or live application. Local scripted tests verify rules and rejection paths; read-only Studionet schema compilation verifies source loading and ABI. Neither establishes live validator agreement. No chain transactions have been submitted for this project.
+Backend and static offline application. **Not deployed.** There is no configured contract address or live chain integration. The application source is in [frontend/](frontend/README.md). Local scripted tests verify rules and rejection paths; read-only Studionet schema compilation verifies source loading and ABI. Neither establishes live validator agreement. No chain transactions have been submitted for this project.
 
 - Network: **Stable Studionet only**, chain **61999**.
 - RPC: `https://studio.genlayer.com/api`.

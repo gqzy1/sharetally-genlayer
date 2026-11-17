@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { TxPhase } from '../../../sdk/types';
 import { shortAddress } from '../adapters/format';
 import { RELEASE_MANIFEST, isDeployedRelease } from '../adapters/release';
 import { DemoBadge, UndeployedBadge } from '../components/StatusBadge';
-import { DEMO_TX_SCENARIOS, loadPendingWrites } from '../domain/txAdapter';
+import { DEMO_TX_SCENARIOS, loadPendingWrites, resolveTransactionView } from '../domain/txAdapter';
 
 const LIFECYCLE_PHASES: TxPhase[] = [
   'AWAITING_SIGNATURE',
@@ -19,24 +19,27 @@ const LIFECYCLE_PHASES: TxPhase[] = [
 export const TransactionPage: React.FC = () => {
   const { hash } = useParams<{ hash: string }>();
   const deployed = isDeployedRelease(RELEASE_MANIFEST);
-  const [selectedDemoId, setSelectedDemoId] = useState<string>(DEMO_TX_SCENARIOS[0].id);
+  const navigate = useNavigate();
+  const view = useMemo(() => resolveTransactionView(hash ?? '', loadPendingWrites()), [hash]);
 
-  const localPending = useMemo(
-    () => loadPendingWrites().find((p) => p.hash.toLowerCase() === (hash ?? '').toLowerCase()) ?? null,
-    [hash],
-  );
+  if (!view) {
+    return (
+      <div className="container" style={{ paddingBlock: '3.5rem' }}>
+        <div className="card card-padded">
+          <UndeployedBadge />
+          <h1 className="editorial-title">Transaction Not Verified</h1>
+          <p>No saved transaction or explicitly authored example matches <span className="mono">{hash}</span>.</p>
+          <p>No receipt has been checked for this hash. Live polling is unavailable in this release.</p>
+          <Link to="/books" className="btn btn-secondary">Back to Catalogue</Link>
+        </div>
+      </div>
+    );
+  }
 
-  const matchedDemo = useMemo(
-    () =>
-      DEMO_TX_SCENARIOS.find((d) => d.hash.toLowerCase() === (hash ?? '').toLowerCase()) ??
-      DEMO_TX_SCENARIOS.find((d) => d.id === selectedDemoId) ??
-      DEMO_TX_SCENARIOS[0],
-    [hash, selectedDemoId],
-  );
-
-  const activePending = localPending ?? matchedDemo.pending;
-  const check = matchedDemo.receiptCheck;
-  const activePhaseIdx = LIFECYCLE_PHASES.indexOf(matchedDemo.phase);
+  const localPending = view.provenance === 'LOCAL_PENDING';
+  const activePending = view.pending;
+  const check = view.receiptCheck;
+  const activePhaseIdx = LIFECYCLE_PHASES.indexOf(view.phase);
 
   return (
     <div className="container" style={{ paddingBlock: '2.5rem 4rem' }}>
@@ -69,9 +72,9 @@ export const TransactionPage: React.FC = () => {
               key={sc.id}
               type="button"
               role="tab"
-              aria-selected={matchedDemo.id === sc.id}
-              className={`demo-tab ${matchedDemo.id === sc.id ? 'demo-tab-active' : ''}`}
-              onClick={() => setSelectedDemoId(sc.id)}
+              aria-selected={view.demo?.id === sc.id}
+              className={`demo-tab ${view.demo?.id === sc.id ? 'demo-tab-active' : ''}`}
+              onClick={() => navigate(`/transactions/${sc.hash}`)}
             >
               {sc.label}
             </button>
@@ -89,7 +92,7 @@ export const TransactionPage: React.FC = () => {
             Method: <span className="mono">{activePending.intent.method}</span>
           </h2>
           <div className="mono" style={{ fontSize: '0.78rem', color: 'var(--ink-secondary)', display: 'grid', gap: '0.4rem', wordBreak: 'break-all' }}>
-            <div><strong>Hash:</strong> {hash ?? activePending.hash}</div>
+            <div><strong>Hash:</strong> {activePending.hash}</div>
             <div><strong>Signer:</strong> {shortAddress(activePending.signer)}</div>
             <div><strong>Contract:</strong> {activePending.contract}</div>
             <div><strong>Chain:</strong> Stable Studionet ({RELEASE_MANIFEST.chainId})</div>

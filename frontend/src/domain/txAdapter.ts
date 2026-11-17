@@ -373,3 +373,30 @@ export function loadPendingWrites(
     return [];
   }
 }
+
+export interface TransactionView {
+  pending: PendingWrite;
+  receiptCheck: ReceiptCheckSummary;
+  phase: TxPhase;
+  demo: DemoTransactionScenario | null;
+  provenance: 'LOCAL_PENDING' | 'OFFLINE_DEMO';
+}
+
+export function resolveTransactionView(hash: string, pendingWrites: PendingWrite[]): TransactionView | null {
+  const requested = hash.toLowerCase();
+  const pending = pendingWrites.find((p) => p.hash.toLowerCase() === requested);
+  if (pending) {
+    return {
+      pending,
+      receiptCheck: evaluateTxEnvelope({ statusName: 'PENDING' }),
+      phase: 'PENDING',
+      demo: null,
+      provenance: 'LOCAL_PENDING',
+    };
+  }
+  const demo = hash === 'demo'
+    ? DEMO_TX_SCENARIOS[0]
+    : DEMO_TX_SCENARIOS.find((d) => d.hash.toLowerCase() === requested || d.id === hash);
+  if (!demo) return null;
+  return { pending: demo.pending, receiptCheck: demo.receiptCheck, phase: demo.phase, demo, provenance: 'OFFLINE_DEMO' };
+}

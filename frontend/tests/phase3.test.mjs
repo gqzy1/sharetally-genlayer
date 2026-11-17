@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import ts from 'typescript';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -15,16 +16,9 @@ function loadTxAdapter() {
     ...code.matchAll(/^export\s+(?:function|const)\s+([A-Za-z0-9_]+)/gm),
   ].map((m) => m[1]);
 
-  code = code
-    .replace(/^import\s+type\s+[\s\S]*?;\n/gm, '')
-    .replace(/export\s+interface\s+\w+\s*\{[\s\S]*?\n\}\n/g, '')
-    .replace(/:\s*\{[\s\S]*?\}\s*\)\s*:\s*ReceiptCheckSummary\s*\{/g, ') {')
-    .replace(/\s+as\s+PendingWrite\[\]/g, '')
-    .replace(/(\w+)\s*:\s*(?:Book|number|string|'OFFLINE_AUTHORED'\s*\|\s*'OFFLINE_DEMO_DRAFT'|Pick<[^>]+>\s*\|\s*null)\s*(?=[,)=])/g, '$1')
-    .replace(/\)\s*:\s*[^{=\n]+\{/g, ') {')
-    .replace(/const events:\s*AuditEvent\[\]\s*=/g, 'const events =')
-    .replace(/export\s+const\s+DEMO_TX_SCENARIOS:\s*DemoTransactionScenario\[\]\s*=/g, 'const DEMO_TX_SCENARIOS =')
-    .replace(/^export\s+/gm, '');
+  code = ts.transpileModule(code, {
+    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
+  }).outputText.replace(/^export\s+/gm, '');
 
   const exports = {};
   const sandbox = {
@@ -117,4 +111,28 @@ test('4. Transaction envelope strictly distinguishes FINALIZED from execution SU
     timedOut: true,
   });
   assert.equal(timedOut.overallOutcome, 'TIMEOUT_UNVERIFIED');
+});
+
+test('saved pending transactions never inherit an authored success receipt', () => {
+  const pending = { ...txAdapter.DEMO_TX_SCENARIOS[0].pending };
+  const view = txAdapter.resolveTransactionView(pending.hash, [pending]);
+  assert.equal(view.provenance, 'LOCAL_PENDING');
+  assert.equal(view.demo, null);
+  assert.equal(view.phase, 'PENDING');
+  assert.equal(view.receiptCheck.isFinalized, false);
+  assert.equal(view.receiptCheck.isExecutionSuccess, false);
+  assert.equal(view.receiptCheck.overallOutcome, 'PENDING');
+});
+
+test('unknown transaction hashes never fall back to an offline example', () => {
+  assert.equal(txAdapter.resolveTransactionView('0x' + 'd'.repeat(64), []), null);
+});
+
+test('explicit demo routes retain their own outcomes and selected identities', () => {
+  const first = txAdapter.resolveTransactionView('demo', []);
+  const failed = txAdapter.resolveTransactionView(txAdapter.DEMO_TX_SCENARIOS[1].hash, []);
+  assert.equal(first.provenance, 'OFFLINE_DEMO');
+  assert.equal(failed.demo.id, 'demo-finalized-failed');
+  assert.equal(failed.receiptCheck.overallOutcome, 'FINALIZED_FAILED');
+  assert.equal(failed.pending.hash, txAdapter.DEMO_TX_SCENARIOS[1].hash);
 });
