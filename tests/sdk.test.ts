@@ -74,6 +74,7 @@ test('SDK numeric receipt status uses official mapping and never promotes ACCEPT
  const {checkFinalReceipt,receiptStatus}=await import('../sdk/client.js');
  const r={...receipt(),statusName:undefined,status:7};assert.equal(receiptStatus(r),'FINALIZED');assert.doesNotThrow(()=>checkFinalReceipt(r,hash));
  r.status=5;assert.equal(receiptStatus(r),'ACCEPTED');assert.throws(()=>checkFinalReceipt(r,hash));
+ (r as any).statusName='FINALIZED';assert.throws(()=>checkFinalReceipt(r,hash),/Conflicting receipt statuses/);
 });
 test('nonzero gas price stops zero-cost writes',async()=>{
  const {assertZeroCost}=await import('../sdk/client.js');

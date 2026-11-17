@@ -16,7 +16,8 @@
     "accept": "node --import tsx scripts/accept.ts",
     "test:sdk": "node --import tsx --test tests/sdk.test.ts",
     "accept:live": "node --import tsx scripts/live.ts",
-    "verify:live": "node --import tsx scripts/verify.ts"
+    "verify:live": "node --import tsx scripts/verify.ts",
+    "verify:browser": "node --import tsx scripts/verify-browser.ts"
   },
   "keywords": [],
   "author": "",

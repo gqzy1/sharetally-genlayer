@@ -4,7 +4,7 @@ import {spawn} from 'node:child_process';
 import fs from 'node:fs/promises';
 const manifest=JSON.parse(await fs.readFile('deployment.json','utf8'));
 let saved=null;try{saved=JSON.parse(await fs.readFile('evidence/browser-live.json','utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
-const canWrite=process.env.ENABLE_BROWSER_WRITE==='STABLE_STUDIONET_61999'&&!saved;
+const canWrite=!process.argv.includes('--read-only')&&process.env.ENABLE_BROWSER_WRITE==='STABLE_STUDIONET_61999'&&!saved;
 if(!saved&&!canWrite){const live=JSON.parse(await fs.readFile('evidence/live.json','utf8'));if(live.finalBook?.state!=='COMMITTED')throw Error('Real COMMITTED evidence required for read-only browser checks');saved={owner:live.finalBook.owner,bookId:live.finalBook.id}}
 await fs.mkdir('artifacts',{recursive:true});
 const server=spawn('npm',['run','preview','--prefix','frontend','--','--host','127.0.0.1','--port','5175'],{stdio:'ignore'});

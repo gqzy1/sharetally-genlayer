@@ -46,7 +46,7 @@ export async function connectWallet(provider: NonNullable<Provider>):Promise<{cl
   catch(e){
     if(obj(e).code!==4902)throw e;
     await provider.request({method:'wallet_addEthereumChain',params:[{chainId:'0xf22f',chainName:'GenLayer Stable Studionet',
-      nativeCurrency:studionet.nativeCurrency,rpcUrls:[RPC],blockExplorerUrls:[studionet.blockExplorers.default.url]}]});
+      nativeCurrency:studionet.nativeCurrency,rpcUrls:[RPC],blockExplorerUrls:[studionet.blockExplorers!.default.url]}]});
     await provider.request({method:'wallet_switchEthereumChain',params:[{chainId:'0xf22f'}]});
   }
   if(Number(await provider.request({method:'eth_chainId'}))!==CHAIN_ID)fail('WRONG_NETWORK','Wallet network differs');
@@ -86,8 +86,10 @@ export function argsFor(intent:WriteIntent):(string|number)[]{
   }
 }
 export function receiptStatus(raw:unknown):string{
-  const r=obj(raw);const named=r.statusName;if(typeof named==='string')return named;
-  const value=r.status;return transactionsStatusNumberToName[String(value) as keyof typeof transactionsStatusNumberToName]??String(value);
+  const r=obj(raw),named=r.statusName,value=r.status;
+  const mapped=transactionsStatusNumberToName[String(value) as keyof typeof transactionsStatusNumberToName];
+  if(typeof named==='string'&&mapped&&named!==mapped)fail('UNVERIFIED_RECEIPT','Conflicting receipt statuses');
+  return typeof named==='string'?named:mapped??String(value);
 }
 export function checkFinalReceipt(raw:unknown,hash:TxHash):void{
   const r=obj(raw);
@@ -103,7 +105,7 @@ export function checkFinalReceipt(raw:unknown,hash:TxHash):void{
     const leaders=Array.isArray(consensus.leader_receipt)?consensus.leader_receipt.map(obj).filter(v=>v.mode==='leader'):[];
     const leader=leaders.at(-1);
     if(!leader || leader.execution_result!=='SUCCESS')fail('TX_FAILED','Leader execution failed or absent',hash);
-    if(r.result!==6 && r.resultName!=='MAJORITY_AGREE')fail('CONSENSUS_FAILED','Majority agreement missing',hash);
+    if((r.result!==undefined && r.result!==6) || (r.resultName!==undefined && r.resultName!=='MAJORITY_AGREE') || (r.result===undefined && r.resultName===undefined))fail('CONSENSUS_FAILED','Majority agreement missing',hash);
     if(r.leader_only!==false || r.execution_mode!=='NORMAL')fail('UNVERIFIED_RECEIPT','Full consensus missing',hash);
   }
 }

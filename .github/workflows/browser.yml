@@ -24,7 +24,7 @@ jobs:
       - run: npm ci --ignore-scripts --prefix frontend
       - run: npx playwright install --with-deps chromium
       - run: npm run build --prefix frontend
-      - run: node scripts/browser-accept.mjs
+      - run: node scripts/browser-accept.mjs --read-only
       - uses: actions/upload-artifact@v4
         if: always()
         with:
