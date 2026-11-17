@@ -1,7 +1,7 @@
 name: Publish frontend
 on:
   push:
-    branches: [main, frontend-gemini]
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
