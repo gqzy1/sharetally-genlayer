@@ -4,7 +4,7 @@ A React/TypeScript workspace for shared quotations, coalition costs, exact Shapl
 
 ## Run
 
-From this directory:
+Install the pinned shared SDK dependencies with `npm ci` in the repository root first. Then run from this directory:
 
 ```sh
 npm ci
