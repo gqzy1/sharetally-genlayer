@@ -4,7 +4,7 @@
 
 | Route | Purpose | Required interactions |
 | --- | --- | --- |
-| `/` | Product introduction and release status | Explain quote → split → all signatures; links to create, inspect and examples; clearly display undeployed state |
+| `/` | Product introduction and release status | Explain quote → split → all signatures; display deployed release status, network and source-verification state; link to create, inspect and examples |
 | `/books/new` | Prepare a quotation | Title, currency, full quote, optional source locator, 2–4 named wallets and descriptions; roster bit preview; immutable input confirmation; seal |
 | `/books` | Organizer catalogue | Read books created by connected or entered owner address; paste an owner-qualified member invitation; empty/error states |
 | `/books/:owner/:tag` | Shared book workspace | Latest-final record, immutable quote, assessment action, cost table, share panel, blockers, approvals, cancel and transaction status |
@@ -32,7 +32,7 @@ After sealing, use the actual owner-qualified ID and load finalized state. Editi
 
 Use the supplied SDK; do not implement a separate signer or protocol client. Request accounts only after user interaction. Network is Stable Studionet 61999 (`0xf22f`) and RPC is exactly `https://studio.genlayer.com/api`. Handle `accountsChanged`, `chainChanged` and `disconnect`: stop new signing, clear the active session and reconnect. Keep pending records pinned to their original signer, contract, chain and intent. Reading and resuming an already submitted transaction must remain possible without a connected signer.
 
-Read release `deployment.json`. While NOT_DEPLOYED or address is null, disable chain writes and show an honest status. Never substitute a fixture address. A deployed release must pass chain and exact source-byte hash checks before every write.
+Read release `deployment.json`. This release requires `DEPLOYED`, chain ID `61999`, the configured Stable Studionet RPC, a non-null contract address and exact source-byte hash verification before enabling writes. If a future manifest is `NOT_DEPLOYED` or the address is null, disable chain writes and show an honest status. Never substitute a fixture address.
 
 Before `submit`, save a local SUBMITTING marker, frozen intent and selected account. On returned hash, save PendingWrite immediately and replace the marker. If the browser crashes with only SUBMITTING, show a reconciliation screen and require inspection of wallet history before another transaction. Do not silently retry signing.
 
