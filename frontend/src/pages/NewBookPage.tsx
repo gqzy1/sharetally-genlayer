@@ -1,3 +1,4 @@
+import {useWallet} from '../app/WalletProvider';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { Currency, Member } from '../../../sdk/types';
@@ -20,6 +21,10 @@ import {
 
 export const NewBookPage: React.FC = () => {
   const navigate = useNavigate();
+  const wallet=useWallet();
+  const [liveError,setLiveError]=useState('');
+  const [liveConfirm,setLiveConfirm]=useState(false);
+  const sealLive=async()=>{try{setLiveError('');if(wallet.signer?.toLowerCase()!==draft.organizerAddress.toLowerCase())throw Error('Connected wallet must be the organizer and a named member');const result=await wallet.send({method:'seal',tag:draft.tag,specification:draft.specification});const [owner,tag]=result.book.id.split(':');navigate(`/books/${owner}/${tag}?mode=live`)}catch(e){setLiveError(String(e))}};
   const deployed = isDeployedRelease(RELEASE_MANIFEST);
 
   const [draft, setDraft] = useState<DraftBookInput>(() => {
@@ -554,7 +559,7 @@ export const NewBookPage: React.FC = () => {
                 type="button"
                 className="btn btn-primary"
                 disabled={!valid}
-                onClick={() => setShowConfirmModal(true)}
+                onClick={() => {setLiveConfirm(false);setShowConfirmModal(true)}}
               >
                 {valid ? 'Review Pre-Seal Confirmation' : 'Fix Validation Errors to Continue'}
               </button>
@@ -562,16 +567,17 @@ export const NewBookPage: React.FC = () => {
               <button
                 type="button"
                 className="btn btn-secondary"
-                disabled={!deployed || !valid}
-                title="Disabled while deployment.json address is null"
+                disabled={!deployed || !valid || !wallet.sourceReady || !wallet.signer || wallet.busy}
+                onClick={()=>{setLiveConfirm(true);setShowConfirmModal(true)}}
               >
-                Seal On-Chain (Disabled — Not Deployed)
+                Seal On-Chain
               </button>
             </div>
           </div>
         </aside>
       </div>
 
+      {liveError&&<p role="alert">{liveError}</p>}
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div
@@ -591,7 +597,7 @@ export const NewBookPage: React.FC = () => {
         >
           <div className="card card-padded" style={{ maxWidth: '580px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <DemoBadge label="OFFLINE PRE-SEAL REVIEW" />
+              <DemoBadge label={liveConfirm ? "LIVE IMMUTABLE SEAL REVIEW" : "OFFLINE PRE-SEAL REVIEW"} />
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowConfirmModal(false)}>
                 Close
               </button>
@@ -600,9 +606,7 @@ export const NewBookPage: React.FC = () => {
               Confirm Immutable Specification
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)', marginBottom: '1rem' }}>
-              Contract writes are disabled in this undeployed release (<span className="mono">address: null</span>).
-              You can save this validated specification as an <span className="mono">OFFLINE / DEMO</span> draft in your
-              local catalogue.
+              {liveConfirm ? 'This signs a real zero-cost Stable Studionet transaction. The quotation and roster are immutable. The transaction is only verified after FINALIZED, successful execution, majority agreement, and latest-final state readback.' : 'Save a clearly marked offline example in this browser. No transaction or member signature is created.'}
             </p>
 
             <div className="ledger-quote-box" style={{ marginBottom: '1rem' }}>
@@ -616,8 +620,8 @@ export const NewBookPage: React.FC = () => {
               <button type="button" className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
                 Back to Edit
               </button>
-              <button type="button" className="btn btn-primary" onClick={handleSaveOfflineDemo}>
-                Save as Offline Demo Book
+              <button type="button" className="btn btn-primary" disabled={wallet.busy} onClick={()=>{if(liveConfirm)void sealLive();else handleSaveOfflineDemo()}}>
+                {liveConfirm ? (wallet.busy?'Waiting for FINALIZED…':'Confirm Live Seal') : 'Save as Offline Demo Book'}
               </button>
             </div>
           </div>

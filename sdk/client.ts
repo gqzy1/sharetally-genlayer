@@ -1,6 +1,6 @@
 import {createClient,abi} from 'genlayer-js';
 import {studionet} from 'genlayer-js/chains';
-import {TransactionHashVariant} from 'genlayer-js/types';
+import {TransactionHashVariant,transactionsStatusNumberToName} from 'genlayer-js/types';
 import type {Address, Book, PendingWrite, Specification, TxHash, TxPhase, VerifiedWrite, WriteIntent} from './types.js';
 import {ShareTallyError} from './types.js';
 
@@ -19,11 +19,19 @@ export function readClient():Client{return createClient({chain:studionet,endpoin
 export async function assertNetwork(client:Client):Promise<void>{
   if(studionet.id!==CHAIN_ID || await client.getChainId()!==CHAIN_ID)fail('WRONG_NETWORK','Stable Studionet 61999 required');
 }
+/** Stable Studio is free; fail closed if the RPC starts quoting a fee. */
+export async function assertZeroCost(client:Client):Promise<void>{
+  await assertNetwork(client);
+  const gasPrice = await client.request({method:'eth_gasPrice'});
+  if(BigInt(gasPrice as string)!==0n)fail('REJECTED','Network requires payment; no transaction sent');
+}
 export function guardedProvider(provider:NonNullable<Provider>,signer:Address):NonNullable<Provider>{
   return new Proxy(provider, {get(target,property){
     if(property==='request')return async (request:Parameters<typeof provider.request>[0])=>{
       if(['eth_sendTransaction','eth_signTransaction','personal_sign','eth_signTypedData_v4'].includes(request.method)){
         if(Number(await target.request({method:'eth_chainId'}))!==CHAIN_ID)fail('WRONG_NETWORK','Wallet moved off Stable Studionet');
+        const tx=(request.params as Record<string,unknown>[]|undefined)?.[0];
+        if(request.method==='eth_sendTransaction' && (!tx || BigInt(String(tx.value??0))!==0n || BigInt(String(tx.gasPrice??-1))!==0n))fail('REJECTED','Only explicit zero-cost transactions are permitted');
         const accounts=await target.request({method:'eth_accounts'}) as string[];
         if(lower(accounts[0])!==lower(signer))fail('SIGNER_CHANGED','Wallet account changed before signing');
       }
@@ -76,9 +84,13 @@ export function argsFor(intent:WriteIntent):(string|number)[]{
     default:return [intent.bookId,intent.revision];
   }
 }
+export function receiptStatus(raw:unknown):string{
+  const r=obj(raw);const named=r.statusName;if(typeof named==='string')return named;
+  const value=r.status;return transactionsStatusNumberToName[String(value) as keyof typeof transactionsStatusNumberToName]??String(value);
+}
 export function checkFinalReceipt(raw:unknown,hash:TxHash):void{
   const r=obj(raw);
-  if((r.statusName??r.status)!=='FINALIZED')fail('UNVERIFIED_RECEIPT','Receipt is not FINALIZED',hash);
+  if(receiptStatus(r)!=='FINALIZED')fail('UNVERIFIED_RECEIPT','Receipt is not FINALIZED',hash);
   if(lower(r.hash??r.txId)!==lower(hash))fail('UNVERIFIED_RECEIPT','Receipt hash differs',hash);
   if('txExecutionResultName' in r){
     if(r.txExecutionResultName!=='FINISHED_WITH_RETURN')fail('TX_FAILED','Execution failed',hash);
@@ -102,7 +114,11 @@ export function receiptCall(raw:unknown):Record<string,unknown>{
   try{return obj(abi.calldata.decode(Uint8Array.from(atob(encoded),c=>c.charCodeAt(0))))}catch{return {}}
 }
 export function checkReceipt(raw:unknown,pending:PendingWrite):void{
-  const r=obj(raw);checkFinalReceipt(r,pending.hash);
+  checkFinalReceipt(raw,pending.hash);checkIntentBinding(raw,pending);
+}
+export function checkIntentBinding(raw:unknown,pending:PendingWrite):void{
+  const r=obj(raw);
+  if(lower(r.hash??r.txId)!==lower(pending.hash))fail('UNVERIFIED_RECEIPT','Receipt hash differs',pending.hash);
   if(lower(r.from_address??r.sender)!==lower(pending.signer)||lower(r.to_address??r.recipient)!==lower(pending.contract))
     fail('UNVERIFIED_RECEIPT','Receipt signer or destination differs',pending.hash);
   if(r.value!==undefined && String(r.value)!=='0')fail('UNVERIFIED_RECEIPT','Unexpected attached value',pending.hash);
@@ -147,6 +163,7 @@ export class ShareTallyApi {
     const frozen=structuredClone(intent);
     try{
       await verifySource(this.client,this.contract,this.sourceSha256);
+      await assertZeroCost(this.client);
       const accounts=await this.client.getAddresses();
       if(lower(accounts[0])!==lower(this.signer))fail('SIGNER_CHANGED','Reconnect the selected wallet');
       onPhase('AWAITING_SIGNATURE');
@@ -163,7 +180,7 @@ export class ShareTallyApi {
     while(Date.now()-started<timeoutMs){
       // Transport failures bubble up with pending preserved by the caller. Never resubmit here.
       const receipt=await this.client.getTransaction({hash:pending.hash as import('genlayer-js/types').TransactionHash});
-      const status=receipt.statusName??receipt.status;
+      const status=receiptStatus(receipt);
       if(status==='FINALIZED'){
         checkReceipt(receipt,pending);onPhase('READING_BACK');
         const book=await this.getBook(pending.bookId);checkReadback(book,pending);

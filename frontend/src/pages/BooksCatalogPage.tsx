@@ -23,7 +23,7 @@ const STATE_FILTERS: Array<'ALL' | BookState> = [
   'CANCELLED',
 ];
 
-export const BooksCatalogPage: React.FC = () => {
+export const OfflineBooksCatalogPage: React.FC = () => {
   const navigate = useNavigate();
   const deployed = isDeployedRelease(RELEASE_MANIFEST);
 
@@ -70,7 +70,7 @@ export const BooksCatalogPage: React.FC = () => {
       return;
     }
     setInvitationError(null);
-    navigate(`/books/${parsed.owner}/${parsed.tag}`);
+    navigate(`/books/${parsed.owner}/${parsed.tag}?mode=offline`);
   };
 
   const handleLookupOwner = (e: React.FormEvent) => {
@@ -258,7 +258,7 @@ export const BooksCatalogPage: React.FC = () => {
                   <span className="mono" style={{ fontSize: '0.72rem', color: 'var(--ink-muted)' }}>
                     Approvals: {book.approvals.length}/{book.input.members.length}
                   </span>
-                  <Link to={`/books/${owner}/${tag}`} className="btn btn-secondary btn-sm">
+                  <Link to={`/books/${owner}/${tag}?mode=offline`} className="btn btn-secondary btn-sm">
                     Inspect Book →
                   </Link>
                 </div>
@@ -297,7 +297,7 @@ export const BooksCatalogPage: React.FC = () => {
                       {book.input.members.map((m) => m.name).join(', ')}
                     </td>
                     <td>
-                      <Link to={`/books/${owner}/${tag}`} className="btn btn-secondary btn-sm">
+                      <Link to={`/books/${owner}/${tag}?mode=offline`} className="btn btn-secondary btn-sm">
                         Inspect
                       </Link>
                     </td>
@@ -311,3 +311,5 @@ export const BooksCatalogPage: React.FC = () => {
     </div>
   );
 };
+
+export {BooksCatalogPage} from './LiveBooksCatalogPage';

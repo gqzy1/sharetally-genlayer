@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { TxPhase } from '../../../sdk/types';
 import { shortAddress } from '../adapters/format';
-import { RELEASE_MANIFEST, isDeployedRelease } from '../adapters/release';
+import { RELEASE_MANIFEST } from '../adapters/release';
 import { DemoBadge, UndeployedBadge } from '../components/StatusBadge';
 import { DEMO_TX_SCENARIOS, loadPendingWrites, resolveTransactionView } from '../domain/txAdapter';
 
@@ -16,9 +16,9 @@ const LIFECYCLE_PHASES: TxPhase[] = [
   'VERIFIED',
 ];
 
-export const TransactionPage: React.FC = () => {
+export const OfflineTransactionPage: React.FC = () => {
   const { hash } = useParams<{ hash: string }>();
-  const deployed = isDeployedRelease(RELEASE_MANIFEST);
+  const deployed = false;
   const navigate = useNavigate();
   const view = useMemo(() => resolveTransactionView(hash ?? '', loadPendingWrites()), [hash]);
 
@@ -105,9 +105,9 @@ export const TransactionPage: React.FC = () => {
               type="button"
               className="btn btn-primary btn-sm"
               disabled={!deployed}
-              title="Live RPC polling disabled while deployment.json address is null"
+              title="Offline scenarios do not poll RPC"
             >
-              Resume Finality Polling (Disabled — Not Deployed)
+              Resume Finality Polling (Offline Only)
             </button>
           </div>
         </div>
@@ -186,3 +186,5 @@ export const TransactionPage: React.FC = () => {
     </div>
   );
 };
+
+export {TransactionPage} from './LiveTransactionPage';

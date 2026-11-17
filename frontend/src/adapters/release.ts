@@ -9,17 +9,9 @@ export interface ReleaseManifest {
   deployTransaction: string | null;
 }
 
-export const RELEASE_MANIFEST: ReleaseManifest = {
-  protocol: 'sharetally-1',
-  status: 'NOT_DEPLOYED',
-  chainId: 61999,
-  rpc: 'https://studio.genlayer.com/api',
-  sdk: 'genlayer-js@1.1.8',
-  address: null,
-  sourceSha256: '0cf60ea7b2dac5a6e25713e889965cf5b6acf22b3d4252932a4c44e779192aae',
-  deployTransaction: null,
-};
+import manifest from '../../../deployment.json';
+export const RELEASE_MANIFEST=manifest as ReleaseManifest;
 
 export function isDeployedRelease(manifest: ReleaseManifest): boolean {
-  return manifest.status === 'DEPLOYED' && Boolean(manifest.address);
+  return manifest.status === 'DEPLOYED' && manifest.chainId===61999 && manifest.rpc==='https://studio.genlayer.com/api' && manifest.sdk==='genlayer-js@1.1.8' && /^0x[0-9a-fA-F]{40}$/.test(manifest.address??'') && !/^0x0{40}$/i.test(manifest.address??'') && /^[a-f0-9]{64}$/.test(manifest.sourceSha256) && /^0x[a-fA-F0-9]{64}$/.test(manifest.deployTransaction??'');
 }

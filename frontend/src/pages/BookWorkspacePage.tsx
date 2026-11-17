@@ -14,7 +14,7 @@ import { OFFLINE_FIXTURES } from '../fixtures/offlineFixtures';
 
 type WorkspaceTab = 'allocation' | 'coalitions' | 'exit' | 'approvals' | 'audit';
 
-export const BookWorkspacePage: React.FC = () => {
+export const OfflineBookWorkspacePage: React.FC = () => {
   const { owner, tag } = useParams<{ owner: string; tag: string }>();
   const deployed = isDeployedRelease(RELEASE_MANIFEST);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>('allocation');
@@ -183,3 +183,5 @@ export const BookWorkspacePage: React.FC = () => {
     </div>
   );
 };
+
+export {BookWorkspacePage} from './LiveBookWorkspacePage';

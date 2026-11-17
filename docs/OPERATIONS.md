@@ -1,6 +1,6 @@
 # Operator procedure
 
-This release has not deployed a contract. No script runs a deployment as part of installation, tests, typechecking or schema compilation. No contract address is preselected.
+This release has a source-verified Stable deployment recorded in root `deployment.json`. No script runs a deployment as part of installation, tests, typechecking or schema compilation. New deployments are always explicit and never replace a recorded pending transaction.
 
 ## Before any deployment
 
@@ -15,7 +15,7 @@ Set `STUDIO_PRIVATE_KEY` privately in the operator environment and `ENABLE_DEPLO
 
 The script writes a SUBMITTING journal before broadcast. After a hash is returned it stores that hash and source digest. Restart resumes the same pending deployment. A surviving SUBMITTING record means the outcome is unknown: manually reconcile the signer history rather than deleting it and blindly redeploying. A finalized failure is retained for inspection, not silently replaced.
 
-After successful FINALIZED execution and majority agreement, the script reads the new source and compares the exact SHA256. Outputs remain in ignored `artifacts/`. A later release can publish reviewed evidence and replace the undeployed manifest using the actual address. Do not invent an address, mutate a previous project's manifest or label compilation as deployment.
+After successful FINALIZED execution and majority agreement, the script reads the new source and compares the exact SHA256. Outputs remain in ignored `artifacts/`. Publish only source-verified manifest fields and sanitized real receipts. Do not invent an address, mutate a previous project's manifest or label compilation as deployment.
 
 ## Lifecycle acceptance
 
@@ -36,4 +36,12 @@ Acceptance matrix:
 
 For every submitted operation preserve chain/RPC, input intent, signer, source hash, hash, complete raw receipt and matching latest-final readback. Distinguish business outcomes from execution success. Verify calldata, full consensus, finality, execution and majority agreement. Confirm all actual member signatures for commitment. Retain unsuccessful attempts honestly.
 
-The acceptance script is a one-operation building block, not a claim that this matrix has been run. These scenarios remain **unexecuted on-chain** in this release.
+The acceptance script is a one-operation building block, not a claim that this matrix has been run. The actual executed subset and hashes are recorded in `evidence/live.json`; do not infer that an unrecorded scenario was tested.
+
+## Reproduce and verify
+
+`ENABLE_WRITE=STABLE_STUDIONET_61999 npm run accept:live` runs a resumable, zero-cost multi-member acceptance using generated dedicated signers in ignored `.local/actors.json`. It requires the verified `artifacts/deployment.json`. Preserve this file and the original signers between restarts. Existing successful operations are skipped; pending hashes are resumed. Never delete journals to work around a timeout.
+
+`npm run verify:live` performs source verification, refetches each recorded receipt, checks intent bindings, validates expected failures and reads the current COMMITTED state. It does not deploy, sign or submit any transaction.
+
+The public static application is built by the Pages workflow from the existing release branch and main. No RPC secret, private key or paid service is needed. The Checks workflow runs backend, SDK, frontend, typechecking and production build checks. Portal submission remains a separate manual action.

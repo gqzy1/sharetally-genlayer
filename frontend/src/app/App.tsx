@@ -1,4 +1,5 @@
 import React from 'react';
+import {WalletProvider,WalletPanel} from './WalletProvider';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ReleaseBanner } from '../components/ReleaseBanner';
 import { Navbar } from '../components/Navbar';
@@ -11,10 +12,10 @@ import { ExamplesPage } from '../pages/ExamplesPage';
 import { TransactionPage } from '../pages/TransactionPage';
 
 export const App: React.FC = () => (
-  <HashRouter>
+  <HashRouter><WalletProvider>
     <div className="app-shell">
       <ReleaseBanner />
-      <Navbar />
+      <Navbar /><WalletPanel />
       <main className="app-main">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -28,7 +29,7 @@ export const App: React.FC = () => (
       </main>
       <Footer />
     </div>
-  </HashRouter>
+  </WalletProvider></HashRouter>
 );
 
 export default App;

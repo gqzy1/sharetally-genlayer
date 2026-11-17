@@ -1,11 +1,10 @@
 import React from 'react';
 import type { Book } from '../../../../sdk/types';
 import { formatMajorShort, shortAddress } from '../../adapters/format';
-import { RELEASE_MANIFEST, isDeployedRelease } from '../../adapters/release';
 import { DemoBadge, StatusBadge } from '../StatusBadge';
 
 export const ApprovalPanel: React.FC<{ book: Book }> = ({ book }) => {
-  const deployed = isDeployedRelease(RELEASE_MANIFEST);
+  const deployed = false;
   const { members, currency } = book.input;
   const proof = book.proof;
   const charges = proof && 'charges' in proof ? proof.charges : null;
@@ -80,13 +79,12 @@ export const ApprovalPanel: React.FC<{ book: Book }> = ({ book }) => {
       {/* Honest Undeployed Mock Adapter Notice */}
       <div className="notice-box notice-warning" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <DemoBadge label="MOCK ADAPTER · NOT DEPLOYED" />
-          <strong>Live Wallet Signing Disabled</strong>
+          <DemoBadge label="OFFLINE EXAMPLE · NO SIGNING" />
+          <strong>Offline Member Consent Preview</strong>
         </div>
         <span>
-          Chain writes (<span className="mono">assess</span>, <span className="mono">approve</span>,{' '}
-          <span className="mono">cancel</span>) are disabled while <span className="mono">deployment.json</span> has{' '}
-          <span className="mono">address: null</span>. No fake wallet signature or transaction hash will be generated.
+          This view uses authored offline data and cannot sign transactions. Open the live catalogue
+          to read a real book and use its connected member wallet.
         </span>
       </div>
 
@@ -98,7 +96,7 @@ export const ApprovalPanel: React.FC<{ book: Book }> = ({ book }) => {
             disabled={!deployed || book.state !== 'READY'}
             title="Disabled until contract is deployed and wallet is connected"
           >
-            Approve Exact Allocation (Disabled — Not Deployed)
+            Approve Exact Allocation (Offline Only)
           </button>
           <button
             type="button"
@@ -106,7 +104,7 @@ export const ApprovalPanel: React.FC<{ book: Book }> = ({ book }) => {
             disabled={!deployed}
             title="Disabled until contract is deployed and wallet is connected"
           >
-            Cancel Book (Disabled — Not Deployed)
+            Cancel Book (Offline Only)
           </button>
         </div>
       )}

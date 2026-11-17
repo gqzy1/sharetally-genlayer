@@ -1,26 +1,22 @@
-# Validation record
+# Validation and evidence
 
-Backend release reviewed on 2026-11-18 (Asia/Shanghai).
+Only `evidence/receipts/` and recorded live operations constitute network transaction evidence. Authored fixtures and scripted hosts are explicitly offline.
 
-| Check | Actual result | Scope |
-| --- | --- | --- |
-| Contract unit groups | 11 passed | Scripted GenLayer host; permissions, revision/hash binding, terminal states, missing terms, bad outputs, disagreement and injection-shaped evidence |
-| Exhaustive arithmetic | 2,187 three-member cost games | All seven nonempty coalition costs in 0–2; monotonicity and supported results checked |
-| Four-member arithmetic | 251 cost games | 250 seeded monotone tables plus maximum bounded cost; independent permutation oracle |
-| SDK unit groups | 9 passed | Eight base cases plus provider signing guard; receipt/calldata binding, latest-final reads, timeout recovery, wrong network/account |
-| TypeScript | passed | SDK, scripts and tests compile against exact genlayer-js 1.1.8 |
-| GenVM lint / SDK validation | passed | 7 public methods: 3 views, 4 nonpayable writes; no constructor arguments |
-| Stable Studionet read-only schema | passed | Real RPC compilation, exact source digest recorded in `evidence/schema.json` |
-| Default deployment/write guards | expected refusal | Running scripts without their explicit environment gates exits before any chain write |
-| Deployment / chain lifecycle | not performed | No address, deployment hash or chain execution claim |
-| Browser/frontend | not performed | Backend release only |
+The deployed source matches SHA256 `b5a98d59a3cea8a31829268b264e9bb284138021754e22a8e9bb0a67da16a135`. Deployment transaction `0xf31804d9b6d9a73939b8665beb38e73e237c44de32a463f8472637ce15ab2d75` is FINALIZED, has SUCCESS leader execution and MAJORITY_AGREE with full consensus. Its source was retrieved through SDK 1.1.8 and compared byte-for-byte by SHA256.
 
-The 2,187 and 251 arithmetic cases run inside the 11 contract unit groups; they are not additional network tests. SDK tests use authored receipt fixtures whose calldata is encoded with the real SDK. They do not constitute real transaction receipts.
+Local checks cover exact integer Shapley arithmetic, 2,187 bounded three-member games, 251 four-member cases with an independent permutation oracle, access control, revisions, allocation digest binding, terminal states, malformed model outputs, semantic disagreement, JSON object responses, omitted nullable UNKNOWN fields, and adversarial quotation text. These are deterministic scripted-host tests, not simulated chain evidence.
 
-[evidence/contract-tests.txt](../evidence/contract-tests.txt), [evidence/sdk-tests.txt](../evidence/sdk-tests.txt), [evidence/wallet-guard-test.txt](../evidence/wallet-guard-test.txt), [evidence/genvm-check.json](../evidence/genvm-check.json) and [evidence/schema.json](../evidence/schema.json) retain the actual local outputs and read-only compilation response. The linter's I200 advisory says a newer runner exists; the explicitly pinned runner passed the current Stable Studionet compilation. It was not changed to an unverified runner.
+SDK checks reject provisional ACCEPTED, unsuccessful execution, missing majority, wrong signer/destination/calldata/hash, and wrong wallet network. Timeout recovery polls the same original hash. Frontend checks include all previous routing, fixture, storage and arithmetic tests plus live journal persistence, duplicate suppression and storage failure behavior.
 
-## Important limits
+## Evidence interpretation
 
-Scripted hosts do not test actual model reasoning, validator independence in production, correlated prompt-injection failures, network rotations, appeals, fees or actual wallet-extension behavior. Schema compilation checks source loading and ABI, not an operational multi-party workflow. The full live matrix in `OPERATIONS.md` remains required before advertising a deployed product.
+- FINALIZED establishes finality, not execution success.
+- SUCCESS establishes execution, not a READY allocation. A successfully assessed ambiguous quotation may be REVIEW; an unsafe split may be BLOCKED.
+- MAJORITY_AGREE and full-consensus mode are checked independently.
+- A verified operation also binds actual signer, destination and calldata to its saved intent, and reads actual latest-final state.
+- A failed execution is never reported as a successful operation. Negative acceptance must preserve the unchanged book.
+- The source pin passes GenVM validation. The linter reports an advisory that a newer runner exists; this release retains the runner that compiled on Stable Studionet.
 
-Exact local checks establish integer conservation, the permutation definition of Shapley shares and all coalition inequalities under supplied cost tables. They do not establish that those prices are authentic or that a supplier will honor them. Consensus validates interpretation of declared text, not a supplier identity.
+## Limits
+
+Consensus interprets declared quotation text; supplier identity, price authenticity and fulfillment remain outside the contract. Shared model errors remain possible. Local tests do not establish real validator behavior; network receipts are needed for that. The application does not handle payments or appeals. Wallet-extension prompts depend on the installed wallet; ephemeral session keys are lost on tab reload. The browser operation journal is local history, not an exhaustive global index. Public test quotations contain no private customer information.

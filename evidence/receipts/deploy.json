@@ -1,0 +1,46 @@
+{
+  "hash": "0xf31804d9b6d9a73939b8665beb38e73e237c44de32a463f8472637ce15ab2d75",
+  "from_address": "0x495602d2a308B2da07a22acb5e48A2D684Cf64E1",
+  "to_address": "0xfE63843CA44aD3089Ba18D4C0298c44431fa4379",
+  "status": 7,
+  "statusName": "FINALIZED",
+  "result": 6,
+  "leader_only": false,
+  "execution_mode": "NORMAL",
+  "consensus_data": {
+    "votes": {
+      "0x215c6BA80EdD9a47856D63E959A32AFE6B5Aa575": "agree",
+      "0x5Bf68b9b661C86D6083B2F67faf19fF649a8a203": "idle",
+      "0x9e716966Fbc31a155250000CfC6C5E0aefbA9a95": "agree",
+      "0xAfA5B76d8c2b976097406893b59C499b5D92D878": "agree",
+      "0xf66D41686dDa4B13E0B29Bf432C7E6F1C008d639": "idle"
+    },
+    "leader_receipt": [
+      {
+        "mode": "leader",
+        "execution_result": "SUCCESS",
+        "genvm_result": {
+          "stderr": "",
+          "stdout": "",
+          "raw_error": null,
+          "error_code": null,
+          "error_description": null
+        },
+        "vote": null,
+        "eq_outputs": {}
+      },
+      {
+        "mode": "validator",
+        "execution_result": "SUCCESS",
+        "genvm_result": {
+          "stderr": "",
+          "stdout": "",
+          "raw_error": null,
+          "error_code": null,
+          "error_description": null
+        },
+        "vote": "agree"
+      }
+    ]
+  }
+}

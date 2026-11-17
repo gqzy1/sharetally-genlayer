@@ -60,6 +60,15 @@ def assess(obj,n=3):
     return json.loads(obj.assess(A+':sample',0))
 
 class ContractTests(unittest.TestCase):
+    def test_native_json_objects_and_nullable_unknown(self):
+        obj = fresh(); key = obj.seal('sample', json.dumps(data()))
+        value = response(); value['rows'][0] = {'mask': 1, 'status': 'UNKNOWN'}
+        host.queue = [value, value, {'valid': True}]
+        self.assertEqual(json.loads(obj.assess(key, 0))['state'], 'REVIEW')
+        self.assertFalse(c.valid_audit({'valid': 'true'}))
+        self.assertFalse(c.valid_audit({'valid': True, 'extra': True}))
+        self.assertTrue(c.valid_audit({'valid': True}))
+
     def test_full_signed_lifecycle(self):
         obj=fresh();key=obj.seal('sample',json.dumps(data()))
         self.assertEqual(key,obj.seal('sample',json.dumps(data())))

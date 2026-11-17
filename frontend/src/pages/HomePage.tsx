@@ -190,12 +190,12 @@ export const HomePage: React.FC = () => {
                 01 · Release Manifest
               </div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-                Not Yet Deployed
+                {RELEASE_MANIFEST.status}
               </h3>
               <p style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)', lineHeight: 1.6 }}>
-                <span className="mono">deployment.json</span> currently sets <span className="mono">address: null</span>{' '}
-                on Stable Studionet (Chain <span className="mono">{RELEASE_MANIFEST.chainId}</span>). All chain writes
-                remain disabled until a verified contract address is published.
+                Stable Studionet (Chain {RELEASE_MANIFEST.chainId}). Live operations verify the deployed
+                source against this release before signing. Offline examples remain explicitly separated.
+                <span className="mono" style={{overflowWrap:'anywhere'}}> {RELEASE_MANIFEST.address ?? 'No verified address'}</span>
               </p>
             </article>
 
