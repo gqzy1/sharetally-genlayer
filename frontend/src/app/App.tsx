@@ -1,0 +1,34 @@
+import React from 'react';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ReleaseBanner } from '../components/ReleaseBanner';
+import { Navbar } from '../components/Navbar';
+import { Footer } from '../components/Footer';
+import { HomePage } from '../pages/HomePage';
+import { NewBookPage } from '../pages/NewBookPage';
+import { BooksCatalogPage } from '../pages/BooksCatalogPage';
+import { BookWorkspacePage } from '../pages/BookWorkspacePage';
+import { ExamplesPage } from '../pages/ExamplesPage';
+import { TransactionPage } from '../pages/TransactionPage';
+
+export const App: React.FC = () => (
+  <HashRouter>
+    <div className="app-shell">
+      <ReleaseBanner />
+      <Navbar />
+      <main className="app-main">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/books/new" element={<NewBookPage />} />
+          <Route path="/books" element={<BooksCatalogPage />} />
+          <Route path="/books/:owner/:tag" element={<BookWorkspacePage />} />
+          <Route path="/examples" element={<ExamplesPage />} />
+          <Route path="/transactions/:hash" element={<TransactionPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
+  </HashRouter>
+);
+
+export default App;
