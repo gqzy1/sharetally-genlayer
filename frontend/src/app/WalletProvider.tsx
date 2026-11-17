@@ -36,7 +36,7 @@ export function WalletProvider({children}:{children:React.ReactNode}){
  const resume=async(e:LiveEntry)=>{if(lock.current)throw Error('One operation at a time');lock.current=true;setBusy(true);try{return await poll(e)}finally{lock.current=false;setBusy(false)}};
  const send=async(intent:WriteIntent)=>{
   if(lock.current||!wallet||!sourceReady)throw Error('Connect a wallet and verify the source before submitting');
-  if(outstanding(loadLiveEntries(),intentBook(intent,wallet.signer),release.address!))throw Error('An unresolved operation exists for this book. Resume its original hash; do not submit again.');
+  if(outstanding(loadLiveEntries(true),intentBook(intent,wallet.signer),release.address!))throw Error('An unresolved operation exists for this book. Resume its original hash; do not submit again.');
   lock.current=true;setBusy(true);setError('');
   let entry:LiveEntry={id:crypto.randomUUID(),contract:release.address!,signer:wallet.signer,intent:structuredClone(intent),phase:'SUBMITTING'};
   try{store(entry);const api=new ShareTallyApi(wallet.client,release.address!,release.sourceSha256,wallet.signer);

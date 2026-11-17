@@ -1,0 +1,178 @@
+{
+  "kind": "read-only-live-evidence-reverification",
+  "chainId": 61999,
+  "sourceSha256": "b5a98d59a3cea8a31829268b264e9bb284138021754e22a8e9bb0a67da16a135",
+  "onchainSha256": "b5a98d59a3cea8a31829268b264e9bb284138021754e22a8e9bb0a67da16a135",
+  "sourceMatch": true,
+  "observedAt": "2026-11-17T21:34:29.343Z",
+  "deployment": "0xf31804d9b6d9a73939b8665beb38e73e237c44de32a463f8472637ce15ab2d75",
+  "operations": [
+    {
+      "name": "seal-main",
+      "hash": "0x9ea0763c5a98b7d529f42077e002ffc6a5d901643d0430756bb6baec0f70e6b5",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    },
+    {
+      "name": "assess-main",
+      "hash": "0xde75847ba84ee06e4ebdc390dfbf5cf489033f70edd4c654ab1d3ac8bd2468c4",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    },
+    {
+      "name": "reject-outsider",
+      "hash": "0x95ef14102657c9a6159b18d6f75852c3a57602fd4fdad566097d86d8ce660576",
+      "status": "FINALIZED",
+      "expectedError": "MEMBER_ONLY",
+      "verified": true
+    },
+    {
+      "name": "approve-owner",
+      "hash": "0x2f28958dd7a0ee744f0424ea35191d591cb2d3218cddc8a470a29a255e347ffc",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    },
+    {
+      "name": "reject-duplicate",
+      "hash": "0xa9d88eaf8c34590f674bc3bb10322ab3867530faf3b2099036162f4bbaa31a00",
+      "status": "FINALIZED",
+      "expectedError": "ALREADY_APPROVED",
+      "verified": true
+    },
+    {
+      "name": "approve-member",
+      "hash": "0xbec022a5400354949f5169c3e60454ec2685f1b2241dbf3a79abd698209139f1",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    },
+    {
+      "name": "reject-terminal",
+      "hash": "0xf05dad34486cc3587f748b620736c6a7f15ec8a34c2cdfcfe51ae587b5a5a3bc",
+      "status": "FINALIZED",
+      "expectedError": "TERMINAL",
+      "verified": true
+    },
+    {
+      "name": "seal-cancel",
+      "hash": "0xe94b96be076859137a3076b98e049b7d3dde191d95e2b6fd4f339f14d32496ec",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    },
+    {
+      "name": "cancel",
+      "hash": "0xb222dc054141089405a0bc97f301889d656c7d272360eb133b2a1c9687bb4fb7",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    },
+    {
+      "name": "seal-review-example",
+      "hash": "0xf80a3f4acfdfd0f53126949154e38f4b5452ca665b0eaf828c65af02d184b06a",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    },
+    {
+      "name": "assess-review-example",
+      "hash": "0x4514e0e0300703a841ae0bca00677a3cdaa55c072ba53d7966ca5af06de307b0",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    },
+    {
+      "name": "seal-blocked-example",
+      "hash": "0x74606d40f4b2e9a467d436a3ee3b9247d0cbdffa694710fed22e12ec7e7de34f",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    },
+    {
+      "name": "assess-blocked-example",
+      "hash": "0x1161872e0ab1e788ec79691854fa4c593cb9a50fc3baa442a1d6b1e03c312c0d",
+      "status": "FINALIZED",
+      "expectedError": null,
+      "verified": true
+    }
+  ],
+  "finalBook": {
+    "accepted": {
+      "rows": [
+        {
+          "cost": 150,
+          "mask": 1,
+          "quote": "The total price is 120 minor units per nonempty group, plus 30 minor units per member.",
+          "status": "KNOWN"
+        },
+        {
+          "cost": 150,
+          "mask": 2,
+          "quote": "The total price is 120 minor units per nonempty group, plus 30 minor units per member.",
+          "status": "KNOWN"
+        },
+        {
+          "cost": 180,
+          "mask": 3,
+          "quote": "The total price is 120 minor units per nonempty group, plus 30 minor units per member.",
+          "status": "KNOWN"
+        }
+      ]
+    },
+    "allocation_hash": "4bdb876c32e6b44779b54947d0a67ebaa7bdb53276604b3328d158b1c2c41471",
+    "approvals": [
+      "0x495602d2a308b2da07a22acb5e48a2d684cf64e1",
+      "0x8bef0905ee02b12662281bdf67a7ca16b3f2ff17"
+    ],
+    "id": "0x495602d2a308b2da07a22acb5e48a2d684cf64e1:print-setup",
+    "input": {
+      "currency": "GBP",
+      "members": [
+        {
+          "address": "0x495602d2a308b2da07a22acb5e48a2d684cf64e1",
+          "description": "One identical print order",
+          "name": "Ada"
+        },
+        {
+          "address": "0x8bef0905ee02b12662281bdf67a7ca16b3f2ff17",
+          "description": "One identical print order",
+          "name": "Bo"
+        }
+      ],
+      "quotation": "The total price is 120 minor units per nonempty group, plus 30 minor units per member. No other fees apply.",
+      "source_locator": "Acceptance quotation; supplier identity is not independently authenticated.",
+      "title": "Shared print setup"
+    },
+    "input_hash": "8c2016bbd4a625d0a8be61b87644e305c911ad79252357519a6f2edc2b21c06c",
+    "owner": "0x495602d2a308b2da07a22acb5e48a2d684cf64e1",
+    "proof": {
+      "blockers": [],
+      "charges": [
+        90,
+        90
+      ],
+      "costs": [
+        0,
+        150,
+        150,
+        180
+      ],
+      "denominator": 2,
+      "numerators": [
+        180,
+        180
+      ],
+      "rounding_order": [
+        0,
+        1
+      ],
+      "status": "READY"
+    },
+    "revision": 3,
+    "state": "COMMITTED"
+  },
+  "variant": "latest-final"
+}

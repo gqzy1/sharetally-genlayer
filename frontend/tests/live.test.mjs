@@ -20,3 +20,8 @@ test('storage quota failures prevent submission markers from silently disappeari
 test('real and offline book storage are distinct namespaces',()=>{
  assert.ok(code.includes('sharetally.live.operations.v1'));assert.equal(code.includes('sharetally.offline_books.v1'),false);
 });
+test('corrupted transaction journals fail closed before a new submission marker',()=>{
+ const j=journal({getItem:()=>'{broken',setItem:()=>{throw Error('should not write')}});
+ assert.throws(()=>j.loadLiveEntries(true),/Reconcile original hashes/);
+ assert.throws(()=>j.saveLiveEntry({id:'new'}),/Reconcile original hashes/);
+});

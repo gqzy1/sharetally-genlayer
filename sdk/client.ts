@@ -67,7 +67,7 @@ export async function listBooks(client:Client,contract:Address,owner:Address):Pr
   if(!Array.isArray(ids)||ids.some(id=>typeof id!=='string'))return fail('BAD_RESPONSE','Invalid book catalogue');
   return ids as string[];
 }
-export async function verifySource(client:Client,contract:Address,expectedSha256:string):Promise<void>{
+export async function verifySource(client:Client,contract:Address,expectedSha256:string):Promise<string>{
   await assertNetwork(client);
   if(!/^0x[0-9a-fA-F]{40}$/.test(contract)||/^0x0{40}$/i.test(contract))fail('NOT_DEPLOYED','No deployed contract configured');
   if(!/^[0-9a-f]{64}$/.test(expectedSha256))fail('SOURCE_MISMATCH','Missing release source hash');
@@ -76,6 +76,7 @@ export async function verifySource(client:Client,contract:Address,expectedSha256
   const bytes=new TextEncoder().encode(code);
   const actual=Array.from(new Uint8Array(await globalThis.crypto.subtle.digest('SHA-256',bytes))).map(v=>v.toString(16).padStart(2,'0')).join('');
   if(actual!==expectedSha256)fail('SOURCE_MISMATCH','Deployed bytes differ from this release');
+  return actual;
 }
 export function argsFor(intent:WriteIntent):(string|number)[]{
   switch(intent.method){

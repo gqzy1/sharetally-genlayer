@@ -1,3 +1,8 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> sharetally-genlayer@1.0.0 test
+> python -m unittest discover -s tests -v && npm run test:sdk
+
 test_exhaustive_three_member_cost_games (test_contract.ArithmeticOracleTests.test_exhaustive_three_member_cost_games) ... ok
 test_four_member_games (test_contract.ArithmeticOracleTests.test_four_member_games) ... ok
 test_access_revision_and_digest_boundaries (test_contract.ContractTests.test_access_revision_and_digest_boundaries) ... ok
@@ -6,11 +11,36 @@ test_full_signed_lifecycle (test_contract.ContractTests.test_full_signed_lifecyc
 test_injection_remains_in_evidence_and_disagreement_rejects (test_contract.ContractTests.test_injection_remains_in_evidence_and_disagreement_rejects) ... ok
 test_input_isolation_idempotency_and_limits (test_contract.ContractTests.test_input_isolation_idempotency_and_limits) ... ok
 test_leader_and_validator_failures_leave_sealed (test_contract.ContractTests.test_leader_and_validator_failures_leave_sealed) ... ok
+test_native_json_objects_and_nullable_unknown (test_contract.ContractTests.test_native_json_objects_and_nullable_unknown) ... ok
 test_quote_tampering_and_result_schema (test_contract.ContractTests.test_quote_tampering_and_result_schema) ... ok
 test_rounding_can_create_a_blocker (test_contract.ContractTests.test_rounding_can_create_a_blocker) ... ok
 test_unknown_is_business_review_not_model_error (test_contract.ContractTests.test_unknown_is_business_review_not_model_error) ... ok
 
 ----------------------------------------------------------------------
-Ran 11 tests in 0.044s
+Ran 12 tests in 0.048s
 
 OK
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> sharetally-genlayer@1.0.0 test:sdk
+> node --import tsx --test tests/sdk.test.ts
+
+✔ Stable Studionet receipt validates real SDK encoded calldata (2.463873ms)
+✔ provisional, failure, majority, signer, destination, hash, consensus and calldata are checked (2.96311ms)
+✔ modern SDK receipt also fails closed on missing consensus (0.328995ms)
+✔ readback verifies revision, hash and signed member even after concurrent later approval (0.446827ms)
+✔ resume polls the SAME hash, accepts only finalized success plus latest-final read (8.884922ms)
+✔ timeout and network failure never submit another write (0.858398ms)
+✔ readback distinguishes unsuccessful assessment from successful transaction (0.307672ms)
+✔ JSON response and argument serialization reject invalid data (0.270355ms)
+✔ wallet guard rechecks the actual provider network and account immediately before signing (1.230459ms)
+✔ SDK numeric receipt status uses official mapping and never promotes ACCEPTED (0.892019ms)
+✔ nonzero gas price stops zero-cost writes (0.650378ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1013.525803

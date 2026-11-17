@@ -1,0 +1,38 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> sharetally-frontend@1.0.0 test
+> node --test tests/*.test.mjs
+
+✔ unknown broadcast and pending operations block duplicate submissions across reloads (62.987227ms)
+✔ storage quota failures prevent submission markers from silently disappearing (8.024316ms)
+✔ real and offline book storage are distinct namespaces (0.165339ms)
+✔ corrupted transaction journals fail closed before a new submission marker (6.773431ms)
+✔ all six required routes are configured in App.tsx (2.970264ms)
+✔ release adapter consumes root deployment manifest without a duplicate configuration (0.579173ms)
+✔ offline fixtures carry OFFLINE_AUTHORED provenance without fake chain hashes (0.453032ms)
+✔ 1. form validation accepts valid draft and rejects invalid tag/title/quotation (1.975165ms)
+✔ 2. member count boundary enforces 2 to 4 members (0.43141ms)
+✔ 3. wallet address validation rejects zero address and malformed hex (0.175785ms)
+✔ 4. duplicate member names, duplicate wallets, and non-member organizer are rejected (0.240702ms)
+✔ 5. draft persistence saves, restores, and clears cleanly (1.195911ms)
+✔ 6. quote amount precision handles 2-decimal minor units and rejects invalid amounts (0.357138ms)
+✔ 7. catalogue invitation parser handles owner:tag and route URLs (0.352561ms)
+✔ 1. Shapley allocation efficiency & rounding invariants hold on fixtures (0.745163ms)
+✔ 2. Exit inspection permits READY subgroup and flags BLOCKED coalition with exact excess (0.400954ms)
+✔ 3. Audit trail records creation, quote lock, assessment, exit check, approvals, and cancel (0.302355ms)
+✔ 4. Transaction envelope strictly distinguishes FINALIZED from execution SUCCESS (0.177127ms)
+✔ saved pending transactions never inherit an authored success receipt (0.244488ms)
+✔ unknown transaction hashes never fall back to an offline example (0.126861ms)
+✔ explicit demo routes retain their own outcomes and selected identities (0.147802ms)
+✔ 1. All assessed fixtures satisfy Shapley efficiency & integer budget conservation (0.840826ms)
+✔ 2. READY vs BLOCKED invariants hold strictly across all fixtures (0.367022ms)
+✔ 3. Frontend relative imports resolve to existing files (8.455125ms)
+✔ 4. Frontend package.json is independent and uses tsc --noEmit && vite build (0.480263ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 402.06799

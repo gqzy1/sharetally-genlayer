@@ -7,6 +7,16 @@
   "result": 6,
   "leader_only": false,
   "execution_mode": "NORMAL",
+  "data": {
+    "calldata": {
+      "base64": "Bg==",
+      "raw": [
+        6
+      ],
+      "readable": "{}"
+    },
+    "contract_address": "0xfE63843CA44aD3089Ba18D4C0298c44431fa4379"
+  },
   "consensus_data": {
     "votes": {
       "0x215c6BA80EdD9a47856D63E959A32AFE6B5Aa575": "agree",
@@ -18,6 +28,7 @@
     "leader_receipt": [
       {
         "mode": "leader",
+        "vote": null,
         "execution_result": "SUCCESS",
         "genvm_result": {
           "stderr": "",
@@ -26,11 +37,21 @@
           "error_code": null,
           "error_description": null
         },
-        "vote": null,
+        "result": {
+          "raw": "AAA=",
+          "status": "return",
+          "payload": {
+            "raw": [
+              0
+            ],
+            "readable": "null"
+          }
+        },
         "eq_outputs": {}
       },
       {
         "mode": "validator",
+        "vote": "agree",
         "execution_result": "SUCCESS",
         "genvm_result": {
           "stderr": "",
@@ -39,7 +60,16 @@
           "error_code": null,
           "error_description": null
         },
-        "vote": "agree"
+        "result": {
+          "raw": "AAA=",
+          "status": "return",
+          "payload": {
+            "raw": [
+              0
+            ],
+            "readable": "null"
+          }
+        }
       }
     ]
   }
