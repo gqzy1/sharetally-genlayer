@@ -1,0 +1,16 @@
+test_exhaustive_three_member_cost_games (test_contract.ArithmeticOracleTests.test_exhaustive_three_member_cost_games) ... ok
+test_four_member_games (test_contract.ArithmeticOracleTests.test_four_member_games) ... ok
+test_access_revision_and_digest_boundaries (test_contract.ContractTests.test_access_revision_and_digest_boundaries) ... ok
+test_coalition_block_and_nonmonotonicity (test_contract.ContractTests.test_coalition_block_and_nonmonotonicity) ... ok
+test_full_signed_lifecycle (test_contract.ContractTests.test_full_signed_lifecycle) ... ok
+test_injection_remains_in_evidence_and_disagreement_rejects (test_contract.ContractTests.test_injection_remains_in_evidence_and_disagreement_rejects) ... ok
+test_input_isolation_idempotency_and_limits (test_contract.ContractTests.test_input_isolation_idempotency_and_limits) ... ok
+test_leader_and_validator_failures_leave_sealed (test_contract.ContractTests.test_leader_and_validator_failures_leave_sealed) ... ok
+test_quote_tampering_and_result_schema (test_contract.ContractTests.test_quote_tampering_and_result_schema) ... ok
+test_rounding_can_create_a_blocker (test_contract.ContractTests.test_rounding_can_create_a_blocker) ... ok
+test_unknown_is_business_review_not_model_error (test_contract.ContractTests.test_unknown_is_business_review_not_model_error) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.044s
+
+OK

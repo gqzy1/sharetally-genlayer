@@ -1,0 +1,504 @@
+[
+  {
+    "provenance": "OFFLINE_AUTHORED",
+    "label": "additive-ready",
+    "book": {
+      "id": "0x1111111111111111111111111111111111111111:additive-ready",
+      "owner": "0x1111111111111111111111111111111111111111",
+      "input": {
+        "title": "Shared print setup",
+        "currency": "GBP",
+        "quotation": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 150; Bo = 150; Ada,Bo = 180; Cy = 150; Ada,Cy = 180; Bo,Cy = 180; Ada,Bo,Cy = 210. No other fees apply.",
+        "source_locator": "Declared quote, not independently authenticated",
+        "members": [
+          {
+            "name": "Ada",
+            "address": "0x1111111111111111111111111111111111111111",
+            "description": "One identical print order"
+          },
+          {
+            "name": "Bo",
+            "address": "0x2222222222222222222222222222222222222222",
+            "description": "One identical print order"
+          },
+          {
+            "name": "Cy",
+            "address": "0x3333333333333333333333333333333333333333",
+            "description": "One identical print order"
+          }
+        ]
+      },
+      "input_hash": "bf6530942a1d2fdb3b02ea7cce449c891270f3f5c28cb00c3d82f4b9bc981c3a",
+      "revision": 1,
+      "state": "READY",
+      "approvals": [],
+      "accepted": {
+        "rows": [
+          {
+            "mask": 1,
+            "status": "KNOWN",
+            "cost": 150,
+            "quote": "Ada = 150"
+          },
+          {
+            "mask": 2,
+            "status": "KNOWN",
+            "cost": 150,
+            "quote": "Bo = 150"
+          },
+          {
+            "mask": 3,
+            "status": "KNOWN",
+            "cost": 180,
+            "quote": "Ada,Bo = 180"
+          },
+          {
+            "mask": 4,
+            "status": "KNOWN",
+            "cost": 150,
+            "quote": "Cy = 150"
+          },
+          {
+            "mask": 5,
+            "status": "KNOWN",
+            "cost": 180,
+            "quote": "Ada,Cy = 180"
+          },
+          {
+            "mask": 6,
+            "status": "KNOWN",
+            "cost": 180,
+            "quote": "Bo,Cy = 180"
+          },
+          {
+            "mask": 7,
+            "status": "KNOWN",
+            "cost": 210,
+            "quote": "Ada,Bo,Cy = 210"
+          }
+        ]
+      },
+      "proof": {
+        "status": "READY",
+        "costs": [
+          0,
+          150,
+          150,
+          180,
+          150,
+          180,
+          180,
+          210
+        ],
+        "denominator": 6,
+        "numerators": [
+          420,
+          420,
+          420
+        ],
+        "charges": [
+          70,
+          70,
+          70
+        ],
+        "rounding_order": [
+          0,
+          1,
+          2
+        ],
+        "blockers": []
+      },
+      "allocation_hash": "520a4d493bacaef0923c9a21c99da012315e69fbadc90234411942b67fb591db"
+    }
+  },
+  {
+    "provenance": "OFFLINE_AUTHORED",
+    "label": "coalition-blocked",
+    "book": {
+      "id": "0x1111111111111111111111111111111111111111:coalition-blocked",
+      "owner": "0x1111111111111111111111111111111111111111",
+      "input": {
+        "title": "Shared print setup",
+        "currency": "GBP",
+        "quotation": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 1; Bo = 1; Ada,Bo = 1; Cy = 1; Ada,Cy = 1; Bo,Cy = 1; Ada,Bo,Cy = 3. No other fees apply.",
+        "source_locator": "Declared quote, not independently authenticated",
+        "members": [
+          {
+            "name": "Ada",
+            "address": "0x1111111111111111111111111111111111111111",
+            "description": "One identical print order"
+          },
+          {
+            "name": "Bo",
+            "address": "0x2222222222222222222222222222222222222222",
+            "description": "One identical print order"
+          },
+          {
+            "name": "Cy",
+            "address": "0x3333333333333333333333333333333333333333",
+            "description": "One identical print order"
+          }
+        ]
+      },
+      "input_hash": "4c4a089b84eb894fdfc8328f23b4ed42c806ae5077a266fd48f5fd9dbf1c2538",
+      "revision": 1,
+      "state": "BLOCKED",
+      "approvals": [],
+      "accepted": {
+        "rows": [
+          {
+            "mask": 1,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 1"
+          },
+          {
+            "mask": 2,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 1; Bo = 1"
+          },
+          {
+            "mask": 3,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Ada,Bo = 1"
+          },
+          {
+            "mask": 4,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 1; Bo = 1; Ada,Bo = 1; Cy = 1"
+          },
+          {
+            "mask": 5,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Ada,Cy = 1"
+          },
+          {
+            "mask": 6,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Bo,Cy = 1"
+          },
+          {
+            "mask": 7,
+            "status": "KNOWN",
+            "cost": 3,
+            "quote": "Ada,Bo,Cy = 3"
+          }
+        ]
+      },
+      "proof": {
+        "status": "BLOCKED",
+        "costs": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3
+        ],
+        "denominator": 6,
+        "numerators": [
+          6,
+          6,
+          6
+        ],
+        "charges": [
+          1,
+          1,
+          1
+        ],
+        "rounding_order": [
+          0,
+          1,
+          2
+        ],
+        "blockers": [
+          {
+            "mask": 3,
+            "standalone_cost": 1,
+            "share_numerator": 12,
+            "rounded_charge": 2,
+            "exact_excess_numerator": 6,
+            "rounded_excess": 1
+          },
+          {
+            "mask": 5,
+            "standalone_cost": 1,
+            "share_numerator": 12,
+            "rounded_charge": 2,
+            "exact_excess_numerator": 6,
+            "rounded_excess": 1
+          },
+          {
+            "mask": 6,
+            "standalone_cost": 1,
+            "share_numerator": 12,
+            "rounded_charge": 2,
+            "exact_excess_numerator": 6,
+            "rounded_excess": 1
+          }
+        ]
+      },
+      "allocation_hash": "b59d248d96e5800f94189ab7dfd744f33d0c2de137541d4992129ddc57c82468"
+    }
+  },
+  {
+    "provenance": "OFFLINE_AUTHORED",
+    "label": "nonmonotone-blocked",
+    "book": {
+      "id": "0x1111111111111111111111111111111111111111:nonmonotone-blocked",
+      "owner": "0x1111111111111111111111111111111111111111",
+      "input": {
+        "title": "Shared print setup",
+        "currency": "GBP",
+        "quotation": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 3; Bo = 3; Ada,Bo = 2. No other fees apply.",
+        "source_locator": "Declared quote, not independently authenticated",
+        "members": [
+          {
+            "name": "Ada",
+            "address": "0x1111111111111111111111111111111111111111",
+            "description": "One identical print order"
+          },
+          {
+            "name": "Bo",
+            "address": "0x2222222222222222222222222222222222222222",
+            "description": "One identical print order"
+          }
+        ]
+      },
+      "input_hash": "5bf1ace20ecfc31408d964134e313b86a0624f1445270cbc39e1ae3062a607b4",
+      "revision": 1,
+      "state": "BLOCKED",
+      "approvals": [],
+      "accepted": {
+        "rows": [
+          {
+            "mask": 1,
+            "status": "KNOWN",
+            "cost": 3,
+            "quote": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 3"
+          },
+          {
+            "mask": 2,
+            "status": "KNOWN",
+            "cost": 3,
+            "quote": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 3; Bo = 3"
+          },
+          {
+            "mask": 3,
+            "status": "KNOWN",
+            "cost": 2,
+            "quote": "Ada,Bo = 2"
+          }
+        ]
+      },
+      "proof": {
+        "status": "BLOCKED",
+        "nonmonotone": [
+          {
+            "subset": 1,
+            "superset": 3,
+            "decrease": 1
+          },
+          {
+            "subset": 2,
+            "superset": 3,
+            "decrease": 1
+          }
+        ]
+      },
+      "allocation_hash": "8d70abd75a858c1d3fb5ec412f20c1a782a6ecb75c3e26c649900f63b55d52ad"
+    }
+  },
+  {
+    "provenance": "OFFLINE_AUTHORED",
+    "label": "rounding-blocked",
+    "book": {
+      "id": "0x1111111111111111111111111111111111111111:rounding-blocked",
+      "owner": "0x1111111111111111111111111111111111111111",
+      "input": {
+        "title": "Shared print setup",
+        "currency": "GBP",
+        "quotation": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 1; Bo = 1; Ada,Bo = 1; Cy = 1; Ada,Cy = 1; Bo,Cy = 1; Ada,Bo,Cy = 2; Dee = 1; Ada,Dee = 1; Bo,Dee = 1; Ada,Bo,Dee = 2; Cy,Dee = 1; Ada,Cy,Dee = 2; Bo,Cy,Dee = 2; Ada,Bo,Cy,Dee = 2. No other fees apply.",
+        "source_locator": "Declared quote, not independently authenticated",
+        "members": [
+          {
+            "name": "Ada",
+            "address": "0x1111111111111111111111111111111111111111",
+            "description": "One identical print order"
+          },
+          {
+            "name": "Bo",
+            "address": "0x2222222222222222222222222222222222222222",
+            "description": "One identical print order"
+          },
+          {
+            "name": "Cy",
+            "address": "0x3333333333333333333333333333333333333333",
+            "description": "One identical print order"
+          },
+          {
+            "name": "Dee",
+            "address": "0x4444444444444444444444444444444444444444",
+            "description": "One identical print order"
+          }
+        ]
+      },
+      "input_hash": "538344136c080233587dcbbf522ce39f63dc2a2d90b578c8b24eafc4ac66c4c6",
+      "revision": 1,
+      "state": "BLOCKED",
+      "approvals": [],
+      "accepted": {
+        "rows": [
+          {
+            "mask": 1,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 1"
+          },
+          {
+            "mask": 2,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 1; Bo = 1"
+          },
+          {
+            "mask": 3,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Ada,Bo = 1"
+          },
+          {
+            "mask": 4,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 1; Bo = 1; Ada,Bo = 1; Cy = 1"
+          },
+          {
+            "mask": 5,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Ada,Cy = 1"
+          },
+          {
+            "mask": 6,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Bo,Cy = 1"
+          },
+          {
+            "mask": 7,
+            "status": "KNOWN",
+            "cost": 2,
+            "quote": "Ada,Bo,Cy = 2"
+          },
+          {
+            "mask": 8,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Standalone total prices, in minor units, for every listed exact member combination: Ada = 1; Bo = 1; Ada,Bo = 1; Cy = 1; Ada,Cy = 1; Bo,Cy = 1; Ada,Bo,Cy = 2; Dee = 1"
+          },
+          {
+            "mask": 9,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Ada,Dee = 1"
+          },
+          {
+            "mask": 10,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Bo,Dee = 1"
+          },
+          {
+            "mask": 11,
+            "status": "KNOWN",
+            "cost": 2,
+            "quote": "Ada,Bo,Dee = 2"
+          },
+          {
+            "mask": 12,
+            "status": "KNOWN",
+            "cost": 1,
+            "quote": "Cy,Dee = 1"
+          },
+          {
+            "mask": 13,
+            "status": "KNOWN",
+            "cost": 2,
+            "quote": "Ada,Cy,Dee = 2"
+          },
+          {
+            "mask": 14,
+            "status": "KNOWN",
+            "cost": 2,
+            "quote": "Bo,Cy,Dee = 2"
+          },
+          {
+            "mask": 15,
+            "status": "KNOWN",
+            "cost": 2,
+            "quote": "Ada,Bo,Cy,Dee = 2"
+          }
+        ]
+      },
+      "proof": {
+        "status": "BLOCKED",
+        "costs": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          2,
+          1,
+          2,
+          2,
+          2
+        ],
+        "denominator": 24,
+        "numerators": [
+          12,
+          12,
+          12,
+          12
+        ],
+        "charges": [
+          1,
+          1,
+          0,
+          0
+        ],
+        "rounding_order": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "blockers": [
+          {
+            "mask": 3,
+            "standalone_cost": 1,
+            "share_numerator": 24,
+            "rounded_charge": 2,
+            "exact_excess_numerator": 0,
+            "rounded_excess": 1
+          }
+        ]
+      },
+      "allocation_hash": "df2509b5ba42f9f9f9baa80ebe4c423407252c1a7765ad4f971245ff2b5efb39"
+    }
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "kind": "local-script-default-refusal",
+  "deployment": {"exitCode": 1, "reason": "ENABLE_DEPLOY absent", "transactionSent": false},
+  "acceptance": {"exitCode": 1, "reason": "ENABLE_WRITE absent", "transactionSent": false},
+  "onchainAcceptance": "NOT_PERFORMED"
+}

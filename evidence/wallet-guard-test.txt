@@ -1,0 +1,5 @@
+Command: node --import tsx --test --test-name-pattern='wallet guard' tests/sdk.test.ts
+Observed: 2026-11-18 Asia/Shanghai
+wallet guard rechecks the actual provider network and account immediately before signing: PASS
+Tests: 1; pass: 1; fail: 0
+This targeted test was added after the eight base SDK tests passed; the successful base suite was not repeated.

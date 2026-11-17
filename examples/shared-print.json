@@ -1,0 +1,23 @@
+{
+  "title": "Shared print setup",
+  "currency": "GBP",
+  "quotation": "The total price is 120 minor units per nonempty group, plus 30 minor units per member. No other fees apply.",
+  "source_locator": "Synthetic quotation for an offline example; not a supplier attestation",
+  "members": [
+    {
+      "name": "Ada",
+      "address": "0x1111111111111111111111111111111111111111",
+      "description": "One identical print order"
+    },
+    {
+      "name": "Bo",
+      "address": "0x2222222222222222222222222222222222222222",
+      "description": "One identical print order"
+    },
+    {
+      "name": "Cy",
+      "address": "0x3333333333333333333333333333333333333333",
+      "description": "One identical print order"
+    }
+  ]
+}

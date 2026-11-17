@@ -1,0 +1,20 @@
+
+> sharetally-genlayer@1.0.0 test:sdk
+> node --import tsx --test tests/sdk.test.ts
+
+✔ Stable Studionet receipt validates real SDK encoded calldata (4.899819ms)
+✔ provisional, failure, majority, signer, destination, hash, consensus and calldata are checked (2.24505ms)
+✔ modern SDK receipt also fails closed on missing consensus (0.422344ms)
+✔ readback verifies revision, hash and signed member even after concurrent later approval (0.339411ms)
+✔ resume polls the SAME hash, accepts only finalized success plus latest-final read (9.634544ms)
+✔ timeout and network failure never submit another write (1.23304ms)
+✔ readback distinguishes unsuccessful assessment from successful transaction (0.458978ms)
+✔ JSON response and argument serialization reject invalid data (0.192574ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 823.663264
