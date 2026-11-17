@@ -37,6 +37,7 @@ SDK checks reject provisional ACCEPTED, unsuccessful execution, missing majority
 | GenVM lint and validation | passed; I200 advisory | `evidence/genvm-check.json` |
 | Stable schema compilation | passed | `evidence/schema.json` |
 | Source and receipt re-verification | passed, read-only | `evidence/source-verification.json` |
+| Real headless browser | passed: real COMMITTED read and session wallet connection; zero writes | `evidence/browser-smoke.json`, Actions run 44181749564 |
 
 The SDK bundle triggers Vite's 500 kB chunk-size advisory (about 335 kB gzip). This is a performance advisory, not a compilation failure. CI browser checks only connect an ephemeral wallet and read real COMMITTED state; they never submit transactions. Any real browser write acceptance is separately opt-in and must preserve its own hashes.
 

@@ -1,0 +1,9 @@
+{
+  "kind": "read-only-browser-smoke",
+  "sourceSha256": "b5a98d59a3cea8a31829268b264e9bb284138021754e22a8e9bb0a67da16a135",
+  "bookId": "0x495602d2a308b2da07a22acb5e48a2d684cf64e1:print-setup",
+  "state": "COMMITTED",
+  "observedAt": "2026-11-17T21:38:28.517Z",
+  "transactionsSent": 0,
+  "errors": []
+}

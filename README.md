@@ -23,7 +23,7 @@ The Intelligent Contract is deployed on Stable Studionet, with exact source-byte
 | Deployment transaction | `0xf31804d9b6d9a73939b8665beb38e73e237c44de32a463f8472637ce15ab2d75` |
 | Source SHA256 | `b5a98d59a3cea8a31829268b264e9bb284138021754e22a8e9bb0a67da16a135` |
 
-[Validation and evidence](docs/VALIDATION.md) distinguish network observations, local tests and untested limits. Deployment status does not by itself establish a successful business workflow.
+[Validation and evidence](docs/VALIDATION.md) distinguish network observations, local tests and untested limits. The recorded workflow reaches COMMITTED with two independent wallets; three negative calls fail without changing state. [Open the committed allocation](https://gqzy1.github.io/sharetally-genlayer/#/books/0x495602d2a308b2da07a22acb5e48a2d684cf64e1/print-setup?mode=live).
 
 - Network: **Stable Studionet only**, chain **61999**.
 - RPC: `https://studio.genlayer.com/api`.

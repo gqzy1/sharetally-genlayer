@@ -1,0 +1,9 @@
+{
+  "kind": "read-only-network-observation",
+  "chainId": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "sdk": "genlayer-js@1.1.8",
+  "gasPrice": "0x0",
+  "attachedApplicationValue": "0",
+  "observedAt": "2026-11-17T21:39:26.441Z"
+}

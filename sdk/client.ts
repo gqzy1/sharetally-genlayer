@@ -46,7 +46,7 @@ export async function connectWallet(provider: NonNullable<Provider>):Promise<{cl
   catch(e){
     if(obj(e).code!==4902)throw e;
     await provider.request({method:'wallet_addEthereumChain',params:[{chainId:'0xf22f',chainName:'GenLayer Stable Studionet',
-      nativeCurrency:studionet.nativeCurrency,rpcUrls:[RPC],blockExplorerUrls:['https://explorer-studio.genlayer.com']}]});
+      nativeCurrency:studionet.nativeCurrency,rpcUrls:[RPC],blockExplorerUrls:[studionet.blockExplorers.default.url]}]});
     await provider.request({method:'wallet_switchEthereumChain',params:[{chainId:'0xf22f'}]});
   }
   if(Number(await provider.request({method:'eth_chainId'}))!==CHAIN_ID)fail('WRONG_NETWORK','Wallet network differs');

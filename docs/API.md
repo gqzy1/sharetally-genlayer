@@ -20,7 +20,8 @@ The complete TypeScript domain definitions are [sdk/types.ts](../sdk/types.ts). 
 readClient(): Client
 connectWallet(provider): Promise<{client: Client; signer: Address}>
 assertNetwork(client): Promise<void>
-verifySource(client, contract, sourceSha256): Promise<void>
+verifySource(client, contract, sourceSha256): Promise<string> // actual verified digest
+assertZeroCost(client): Promise<void>
 readBook(client, contract, id): Promise<Book | null>
 listBooks(client, contract, owner): Promise<string[]>
 new ShareTallyApi(client, contract, sourceSha256, signer)
@@ -30,9 +31,9 @@ api.submit(intent, onPhase?): Promise<PendingWrite>
 api.resume(pending, onPhase?, timeoutMs?, intervalMs?): Promise<VerifiedWrite>
 ```
 
-`WriteIntent` is the tagged union in `sdk/types.ts`. `seal` accepts a `Specification`; the SDK serializes it as a string positional argument. Other methods carry owner-qualified book ID, exact current revision and, for approval, the stored allocation hash. All writes attach zero value and use `leaderOnly:false`. Live configuration must provide a verified deployed address and the release source SHA256; the initial manifest has `address:null` and disables writes.
+`WriteIntent` is the tagged union in `sdk/types.ts`. `seal` accepts a `Specification`; the SDK serializes it as a string positional argument. Other methods carry owner-qualified book ID, exact current revision and, for approval, the stored allocation hash. All writes attach zero value and use `leaderOnly:false`. Live configuration must provide a verified deployed address and the release source SHA256; a NOT_DEPLOYED manifest or null address disables writes.
 
-`submit` performs source and network checks, then signs exactly once. Persist its returned PendingWrite immediately. `resume` only polls the existing hash and reads state. It never sends another transaction. Timeout or a readback problem retains the pending record. The application must also persist a SUBMITTING marker before calling submit, so a browser crash before receiving a hash requires manual reconciliation instead of blind retry.
+`submit` performs source, network and zero-gas-price checks, then requests the intended write. Persist its returned PendingWrite immediately. `resume` only polls the existing hash and reads state. It never sends another transaction. Timeout or a readback problem retains the pending record. The application must also persist a SUBMITTING marker before calling submit, so a browser crash before receiving a hash requires manual reconciliation instead of blind retry.
 
 ## Business data
 
