@@ -25,6 +25,14 @@ Local checks cover exact integer Shapley arithmetic, 2,187 bounded three-member 
 
 SDK checks reject provisional ACCEPTED, unsuccessful execution, missing majority, wrong signer/destination/calldata/hash, and wrong wallet network. Timeout recovery polls the same original hash. Frontend checks include all previous routing, fixture, storage and arithmetic tests plus live journal persistence, duplicate suppression and storage failure behavior.
 
+## Published application acceptance
+
+The published application at https://gqzy1.github.io/sharetally-genlayer/ was exercised with two separate real SDK session wallets. Six transactions were signed through the actual application: seal, assess, first-member approval, second-member approval, a separate seal and second-member cancellation. The main book reached COMMITTED revision 3 with both distinct addresses; the second book reached CANCELLED revision 1. The live catalogue independently listed both final records.
+
+`evidence/browser-live.json` contains the six real hashes, original browser-exported pending intents, original per-operation latest-final readbacks and independently refetched sanitized RPC receipts. Every operation passes the existing SDK's FINALIZED, SUCCESS, MAJORITY_AGREE, full consensus, signer, destination, calldata and readback checks. `evidence/browser-committed.jpg` is the actual published page. No receipt, signature or consensus result was simulated. The automated browser workflow remains strictly read-only.
+
+Specific wallet-extension compatibility was not manually exercised; actual signing acceptance used the built-in real session wallets. EIP-1193 account/network guards are covered by SDK tests. Session signing keys stay in tab memory and are lost on reload; durable members should use a wallet they control.
+
 ## Local validation results
 
 | Check | Actual result | Evidence |
@@ -39,7 +47,7 @@ SDK checks reject provisional ACCEPTED, unsuccessful execution, missing majority
 | Source and receipt re-verification | passed, read-only | `evidence/source-verification.json` |
 | Real headless browser | passed: real COMMITTED read and session wallet connection; zero writes | `evidence/browser-smoke.json`, Actions run 44181749564 |
 
-The SDK bundle triggers Vite's 500 kB chunk-size advisory (about 335 kB gzip). This is a performance advisory, not a compilation failure. CI browser checks only connect an ephemeral wallet and read real COMMITTED state; they never submit transactions. Any real browser write acceptance is separately opt-in and must preserve its own hashes.
+The SDK bundle triggers Vite's 500 kB chunk-size advisory (about 335 kB gzip). This is a performance advisory, not a compilation failure. CI browser checks only connect an ephemeral wallet and read real COMMITTED state; they never submit transactions. The separately performed real browser writes and original intents are retained in `evidence/browser-live.json`.
 
 ## Evidence interpretation
 

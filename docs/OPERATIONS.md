@@ -45,3 +45,7 @@ The acceptance script is a one-operation building block, not a claim that this m
 `npm run verify:live` performs source verification, refetches each recorded receipt, checks intent bindings, validates expected failures and reads the current COMMITTED state. It does not deploy, sign or submit any transaction.
 
 The public static application is built by the Pages workflow from the existing release branch and main. No RPC secret, private key or paid service is needed. The Checks workflow runs backend, SDK, frontend, typechecking and production build checks. Portal submission remains a separate manual action.
+
+A fresh checkout can run `verify:live` without any signing key. Recorded actor addresses are audit data, not portable credentials: `accept:live` refuses a different key set over an existing journal. For another test, use the one-operation `accept` tool with a separate ignored journal and a namespace controlled by your own wallet; never delete committed evidence to bypass this guard.
+
+`npm run verify:browser -- observed-hashes.json` is also read-only. Its input names the observed owner/member addresses, the committed and cancelled tags, and six hashes (`seal`, `assess`, `approveOwner`, `approveMember`, `sealCancel`, `cancel`). It verifies the real source, receipts, independent approvals and final states. The published browser evidence additionally retains the original exported pending intents and intermediate readbacks.

@@ -23,5 +23,16 @@
   "buildWarning": "SDK bundle exceeds Vite 500kB chunk advisory; build succeeds.",
   "genvmCheck": "passed; advisory I200 newer runner available",
   "liveAcceptance": "13 business operations plus deployment; actual receipts in receipts/",
-  "readOnlyReverification": "passed; source-verification.json"
+  "readOnlyReverification": "passed; source-verification.json",
+  "publishedBrowserAcceptance": {
+    "passed": true,
+    "realWrites": 6,
+    "distinctSigners": 2,
+    "states": [
+      "COMMITTED",
+      "CANCELLED"
+    ],
+    "evidence": "browser-live.json",
+    "screenshot": "browser-committed.jpg"
+  }
 }

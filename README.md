@@ -31,6 +31,8 @@ The Intelligent Contract is deployed on Stable Studionet, with exact source-byte
 - Python 3.12+ and Node.js 22+.
 - No payment, custody, supplier signature, paid external API or central application backend.
 
+The [published browser acceptance](https://gqzy1.github.io/sharetally-genlayer/#/books/0xd3b57400fec692553ced402e5adff25f1f4419ad/published-print?mode=live) separately completed real seal, consensus assessment and two independent member approvals. [Browser evidence](evidence/browser-live.json) also verifies member cancellation on a second book.
+
 ## Verify locally
 
 ```sh
