@@ -10,9 +10,6 @@
   "data": {
     "calldata": {
       "base64": "Bg==",
-      "raw": [
-        6
-      ],
       "readable": "{}"
     },
     "contract_address": "0xfE63843CA44aD3089Ba18D4C0298c44431fa4379"

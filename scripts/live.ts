@@ -14,7 +14,7 @@ export function publicReceipt(r:any){
  selected.data={...r.data};delete selected.data.contract_code;
  const leaders=r.consensus_data?.leader_receipt;
  if(r.consensus_data)selected.consensus_data={votes:r.consensus_data.votes,leader_receipt:(Array.isArray(leaders)?leaders:leaders?[leaders]:[]).map((x:any)=>Object.fromEntries(['mode','vote','execution_result','genvm_result','result','eq_outputs'].filter(k=>x[k]!==undefined).map(k=>[k,x[k]])))};
- return selected;
+ return JSON.parse(JSON.stringify(selected,(_key,value)=>{if(value&&typeof value==='object'&&typeof value.base64==='string'){const {raw: _raw,...encoded}=value;return encoded}return value}));
 }
 await mkdir('.local',{recursive:true,mode:0o700});await mkdir('evidence/receipts',{recursive:true});
 let keys=await load('.local/actors.json');if(!keys){keys=Object.fromEntries(['owner','member','outsider'].map(x=>[x,generatePrivateKey()]));await writeFile('.local/actors.json',stringify(keys),{mode:0o600,flag:'wx'})}
