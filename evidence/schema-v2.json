@@ -1,0 +1,111 @@
+{
+  "kind": "read-only-rpc-schema-compilation",
+  "chainId": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "sourceSha256": "65a7ed9a835fd611954de9ee39bc2d242a8a9d94fbc08a335b0a7585e91ba80c",
+  "observedAt": "2026-11-23T15:02:52.823Z",
+  "schema": {
+    "ctor": {
+      "params": [],
+      "kwparams": {}
+    },
+    "methods": {
+      "approve": {
+        "params": [
+          [
+            "book_id",
+            "string"
+          ],
+          [
+            "expected_revision",
+            "int"
+          ],
+          [
+            "allocation_hash",
+            "string"
+          ]
+        ],
+        "kwparams": {},
+        "readonly": false,
+        "ret": "string",
+        "payable": false
+      },
+      "assess": {
+        "params": [
+          [
+            "book_id",
+            "string"
+          ],
+          [
+            "expected_revision",
+            "int"
+          ]
+        ],
+        "kwparams": {},
+        "readonly": false,
+        "ret": "string",
+        "payable": false
+      },
+      "cancel": {
+        "params": [
+          [
+            "book_id",
+            "string"
+          ],
+          [
+            "expected_revision",
+            "int"
+          ]
+        ],
+        "kwparams": {},
+        "readonly": false,
+        "ret": "string",
+        "payable": false
+      },
+      "get_book": {
+        "params": [
+          [
+            "book_id",
+            "string"
+          ]
+        ],
+        "kwparams": {},
+        "readonly": true,
+        "ret": "string"
+      },
+      "list_books": {
+        "params": [
+          [
+            "owner",
+            "string"
+          ]
+        ],
+        "kwparams": {},
+        "readonly": true,
+        "ret": "string"
+      },
+      "protocol": {
+        "params": [],
+        "kwparams": {},
+        "readonly": true,
+        "ret": "string"
+      },
+      "seal": {
+        "params": [
+          [
+            "tag",
+            "string"
+          ],
+          [
+            "payload",
+            "string"
+          ]
+        ],
+        "kwparams": {},
+        "readonly": false,
+        "ret": "string",
+        "payable": false
+      }
+    }
+  }
+}

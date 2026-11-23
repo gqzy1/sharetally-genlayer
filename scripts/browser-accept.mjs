@@ -4,6 +4,11 @@ import {spawn} from 'node:child_process';
 import fs from 'node:fs/promises';
 const manifest=JSON.parse(await fs.readFile('deployment.json','utf8'));
 let saved=null;try{saved=JSON.parse(await fs.readFile('evidence/browser-live.json','utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
+if(manifest.protocol==='sharetally-2'){
+ const evidence=JSON.parse(await fs.readFile('evidence/milestone-v2.json','utf8'));
+ if(evidence.cases.recovered?.state!=='COMMITTED')throw Error('Finalized v2 COMMITTED evidence required');
+ saved={bookId:evidence.cases.recovered.id};
+}
 const canWrite=!process.argv.includes('--read-only')&&process.env.ENABLE_BROWSER_WRITE==='STABLE_STUDIONET_61999'&&!saved;
 if(!saved&&!canWrite){const live=JSON.parse(await fs.readFile('evidence/live.json','utf8'));if(live.finalBook?.state!=='COMMITTED')throw Error('Real COMMITTED evidence required for read-only browser checks');saved={owner:live.finalBook.owner,bookId:live.finalBook.id}}
 await fs.mkdir('artifacts',{recursive:true});
@@ -15,16 +20,33 @@ try{
  for(let i=0;i<30;i++){try{const r=await fetch('http://127.0.0.1:5175');if(r.ok)break}catch{}await new Promise(r=>setTimeout(r,500))}
  browser=await chromium.launch({headless:true,...process.env.BROWSER_EXECUTABLE?{executablePath:process.env.BROWSER_EXECUTABLE}:{},args:['--no-sandbox']});
  if(!canWrite){
-  const p=await browser.newPage();pages.push(p);p.on('pageerror',e=>errors.push(e.message));
+  const p=await browser.newPage({reducedMotion:'reduce'});pages.push(p);p.on('pageerror',e=>errors.push(e.message));
+  if(manifest.protocol==='sharetally-2'){
+   await p.goto('http://127.0.0.1:5175/');
+   await p.getByRole('heading',{name:'The split table.'}).waitFor();
+   await p.getByRole('button',{name:'Shapley',exact:true}).click();
+   await p.getByText(/over the quote/).waitFor();
+   await p.getByRole('button',{name:'Selected allocation',exact:true}).click();
+   await p.getByRole('button',{name:'Inspect Cy',exact:true}).first().click();
+   await p.getByRole('link',{name:/Recovered split/}).waitFor();
+   const mobile=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
+   pages.push(mobile);
+   mobile.on('pageerror',e=>errors.push(e.message));
+   await mobile.goto('http://127.0.0.1:5175/');
+   await mobile.getByRole('button',{name:'Inspect Cy',exact:true}).click();
+   await mobile.getByRole('heading',{name:'Cy',exact:true}).waitFor();
+   if(!await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth))throw Error('Mobile layout overflows');
+   await mobile.screenshot({path:'artifacts/browser-press-mobile.png',fullPage:true});
+  }
   const bookId=saved.bookId??`${saved.owner.toLowerCase()}:browser-print`;
   await p.goto(`http://127.0.0.1:5175/#/books/${bookId.replace(':','/')}?mode=live`);
   await p.getByLabel('Book state: COMMITTED').waitFor({timeout:90000});
-  await p.getByRole('button',{name:'Create Free Studio Session',exact:true}).click();await p.getByTestId('wallet-address').waitFor({timeout:90000});
+  await p.getByRole('button',{name:'Create Studio Session',exact:true}).click();await p.getByTestId('wallet-address').waitFor({timeout:90000});
   if(errors.length)throw Error(errors.join('\n'));
   await fs.writeFile('artifacts/browser-smoke.json',JSON.stringify({kind:'read-only-browser-smoke',sourceSha256:manifest.sourceSha256,bookId,state:'COMMITTED',observedAt:new Date().toISOString(),transactionsSent:0,errors},null,2));console.log('Read-only browser latest-final COMMITTED confirmed; zero transactions sent.');
  }else{
   const a=await browser.newPage(),b=await browser.newPage();pages.push(a,b);
-  for(const p of pages){p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());await p.goto('http://127.0.0.1:5175/#/books/new');await p.getByRole('button',{name:'Create Free Studio Session',exact:true}).click();await p.getByTestId('wallet-address').waitFor({timeout:90000})}
+  for(const p of pages){p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());await p.goto('http://127.0.0.1:5175/#/books/new');await p.getByRole('button',{name:'Create Studio Session',exact:true}).click();await p.getByTestId('wallet-address').waitFor({timeout:90000})}
   const owner=await a.getByTestId('wallet-address').textContent(),member=await b.getByTestId('wallet-address').textContent();
   console.log('Two distinct real Studio signers',owner,member);if(owner===member)throw Error('Wallets must differ');
   await a.locator('#book-tag').fill('browser-print');await a.locator('#book-title').fill('Browser shared print setup');await a.locator('#book-organizer').fill(owner);await a.locator('#m-addr-0').fill(owner);await a.locator('#m-addr-1').fill(member);

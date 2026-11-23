@@ -10,7 +10,7 @@ ShareTally fixes one quote and roster, independently validates its complete coal
 
 | Layer | Responsibility |
 | --- | --- |
-| Intelligent Contract | Immutable input, independent semantic consensus, exact Shapley calculation, rounding, coalition checks, permission checks, approvals and terminal state |
+| Intelligent Contract | Immutable input, independent semantic consensus, exact Shapley calculation, rounding, coalition checks, integer feasibility, permission checks, approvals and terminal state |
 | SDK | Stable network restriction, deployed source hash, signing, transaction intent binding, finalized execution verification, finalized state readback |
 | Application | Input assistance, exact quote preview, combination explorer, share display, signature status, recovery of pending operations and exports |
 | Members | Decide whether the declared quote is authentic and acceptable; sign only a plan they inspected |
@@ -19,9 +19,9 @@ No server, database, indexer, private frontend model key, token economics or ext
 
 ## Closed user journey
 
-Create a quote → seal → assess → inspect the entire table → resolve missing terms in a new book if necessary → review exact and rounded shares → each member approves → view and export the committed record. Any member may cancel before commitment. Editing, roster replacement and reassessment of completed findings are deliberately absent; a corrected quote creates a new book.
+Create a quote → seal → assess → inspect the entire table → resolve missing terms in a new book if necessary → compare the original benchmark and selected split → each member approves → view and export the committed record. Any member may cancel before commitment. Editing, roster replacement and reassessment of completed findings are deliberately absent; a corrected quote creates a new book.
 
-The current release is deployed on Stable Studionet (chain ID 61999). The published application reads the release manifest and verifies the deployed contract's exact source bytes before enabling writes. Live books and explicitly labelled offline examples remain separate. Deployment and browser acceptance records are retained under `evidence/`; schema compilation alone is not evidence of deployment or acceptance.
+The current release is deployed on Stable Studionet (chain ID 61999). The published application reads the release manifest and verifies the deployed contract's exact source bytes before enabling writes. Live books and explicitly labelled offline examples remain separate. Deployment and receipt evidence are retained under `evidence/`, with historical browser acceptance tied to its original release.
 
 ## Acceptance scope
 

@@ -20,7 +20,8 @@ test('release adapter consumes root deployment manifest without a duplicate conf
   const releaseTs = fs.readFileSync(path.join(frontendRoot, 'src/adapters/release.ts'), 'utf8');
   assert.ok(releaseTs.includes("import manifest from '../../../deployment.json'"));
   assert.equal(deployment.chainId, 61999);
-  assert.equal(deployment.sdk, 'genlayer-js@1.1.8');
+  const rootPackage = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+  assert.equal(deployment.sdk, 'genlayer-js@' + rootPackage.dependencies['genlayer-js']);
   if (deployment.status === 'DEPLOYED') {
     assert.match(deployment.address, /^0x[0-9a-fA-F]{40}$/);
     assert.match(deployment.deployTransaction, /^0x[0-9a-fA-F]{64}$/);

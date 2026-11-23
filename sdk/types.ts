@@ -7,6 +7,8 @@ export type Finding = {mask: number; status: 'KNOWN'; cost: number; quote: strin
 export interface Blocker {mask: number; standalone_cost: number; share_numerator: number; rounded_charge: number; exact_excess_numerator: number; rounded_excess: number}
 export type Proof = {status: 'REVIEW'; unresolved: number[]} | {status: 'BLOCKED'; nonmonotone: {subset: number; superset: number; decrease: number}[]} | {
   status: 'READY' | 'BLOCKED'; costs: number[]; denominator: number; numerators: number[];
+  method?: 'SHAPLEY' | 'STABLE_INTEGER' | 'NO_STABLE_INTEGER';
+  baseline_charges?: number[]; selected_charges?: number[] | null;
   charges: number[]; rounding_order: number[]; blockers: Blocker[];
 };
 export type BookState = 'SEALED' | 'REVIEW' | 'BLOCKED' | 'READY' | 'COMMITTED' | 'CANCELLED';

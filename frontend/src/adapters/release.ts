@@ -13,5 +13,5 @@ import manifest from '../../../deployment.json';
 export const RELEASE_MANIFEST=manifest as ReleaseManifest;
 
 export function isDeployedRelease(manifest: ReleaseManifest): boolean {
-  return manifest.status === 'DEPLOYED' && manifest.chainId===61999 && manifest.rpc==='https://studio.genlayer.com/api' && manifest.sdk==='genlayer-js@1.1.8' && /^0x[0-9a-fA-F]{40}$/.test(manifest.address??'') && !/^0x0{40}$/i.test(manifest.address??'') && /^[a-f0-9]{64}$/.test(manifest.sourceSha256) && /^0x[a-fA-F0-9]{64}$/.test(manifest.deployTransaction??'');
+  return manifest.status === 'DEPLOYED' && manifest.chainId===61999 && manifest.rpc==='https://studio.genlayer.com/api' && ['genlayer-js@1.1.8','genlayer-js@2.0.0-rc.3'].includes(manifest.sdk) && /^0x[0-9a-fA-F]{40}$/.test(manifest.address??'') && !/^0x0{40}$/i.test(manifest.address??'') && /^[a-f0-9]{64}$/.test(manifest.sourceSha256) && /^0x[a-fA-F0-9]{64}$/.test(manifest.deployTransaction??'');
 }

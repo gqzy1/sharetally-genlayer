@@ -607,7 +607,7 @@ export const NewBookPage: React.FC = () => {
               Confirm Immutable Specification
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)', marginBottom: '1rem' }}>
-              {liveConfirm ? 'This signs a real zero-cost Stable Studionet transaction. The quotation and roster are immutable. The transaction is only verified after FINALIZED, successful execution, majority agreement, and latest-final state readback.' : 'Save a clearly marked offline example in this browser. No transaction or member signature is created.'}
+              {liveConfirm ? 'This signs a real Stable Studionet transaction using capped testnet GEN fees. The quotation and roster are immutable. The transaction is only verified after FINALIZED, successful execution, majority agreement, and latest-final state readback.' : 'Save a clearly marked offline example in this browser. No transaction or member signature is created.'}
             </p>
 
             {liveConfirm&&liveError&&<p role="alert" className="notice-box notice-warning">{liveError}</p>}

@@ -16,15 +16,16 @@
     "accept": "node --import tsx scripts/accept.ts",
     "test:sdk": "node --import tsx --test tests/sdk.test.ts",
     "accept:live": "node --import tsx scripts/live.ts",
-    "verify:live": "node --import tsx scripts/verify.ts",
-    "verify:browser": "node --import tsx scripts/verify-browser.ts"
+    "verify:live": "node --import tsx scripts/milestone.ts",
+    "verify:browser": "node scripts/browser-accept.mjs --read-only",
+    "verify:milestone": "node --import tsx scripts/milestone.ts"
   },
   "keywords": [],
   "author": "chuanqi",
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "genlayer-js": "1.1.8"
+    "genlayer-js": "2.0.0-rc.3"
   },
   "devDependencies": {
     "@types/node": "22.19.0",

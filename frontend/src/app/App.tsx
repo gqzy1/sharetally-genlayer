@@ -1,6 +1,6 @@
 import React from 'react';
 import {WalletProvider,WalletPanel} from './WalletProvider';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ReleaseBanner } from '../components/ReleaseBanner';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -11,11 +11,17 @@ import { BookWorkspacePage } from '../pages/BookWorkspacePage';
 import { ExamplesPage } from '../pages/ExamplesPage';
 import { TransactionPage } from '../pages/TransactionPage';
 
+function LiveWalletControls() {
+  const {pathname, search} = useLocation();
+  const isLive = pathname.startsWith('/books') && new URLSearchParams(search).get('mode') !== 'offline';
+  return isLive ? <WalletPanel /> : null;
+}
+
 export const App: React.FC = () => (
   <HashRouter><WalletProvider>
     <div className="app-shell">
       <ReleaseBanner />
-      <Navbar /><WalletPanel />
+      <Navbar /><LiveWalletControls />
       <main className="app-main">
         <Routes>
           <Route path="/" element={<HomePage />} />

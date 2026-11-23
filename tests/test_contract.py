@@ -192,10 +192,34 @@ class ArithmeticOracleTests(unittest.TestCase):
             charged=sum(proof['charges'][i] for i in range(n) if mask & (1<<i))
             if exact>costs[mask]*proof['denominator'] or charged>costs[mask]:expected.append(mask)
         self.assertEqual([b['mask'] for b in proof['blockers']],expected)
-        self.assertEqual(proof['status'],'BLOCKED' if expected else 'READY')
+        if not expected:
+            self.assertEqual(proof['method'], 'SHAPLEY')
+            self.assertEqual(proof['selected_charges'], proof['charges'])
+        else:
+            self.assertEqual(proof['selected_charges'], c.stable_charges(costs,n))
+            self.assertEqual(proof['status'], 'READY' if proof['selected_charges'] is not None else 'BLOCKED')
 
     def test_exhaustive_three_member_cost_games(self):
         for values in itertools.product(range(3),repeat=7):self.verify([0]+list(values),3)
+
+    def test_bounded_solver_against_exhaustive_integer_vectors(self):
+        rng = random.Random(2026)
+        for n in (2, 3, 4):
+            for _ in range(350):
+                costs = [0] + [rng.randrange(8) for mask in range(1, 1 << n)]
+                total = costs[-1]
+                expected = next((list(x) for x in itertools.product(range(total + 1), repeat=n)
+                                 if sum(x) == total and all(
+                                     sum(x[i] for i in range(n) if mask & (1 << i)) <= costs[mask]
+                                     for mask in range(1, (1 << n) - 1))), None)
+                self.assertEqual(c.stable_charges(costs,n), expected, (costs,n))
+
+    def test_recovered_quote_and_infeasible_quote(self):
+        recovered = c.derive(rows([0,100,100,400,200,300,300,400]),3)
+        self.assertEqual(recovered['baseline_charges'],[134,133,133])
+        self.assertEqual(recovered['selected_charges'],[100,100,200])
+        self.assertEqual(recovered['method'],'STABLE_INTEGER')
+        self.assertEqual(c.derive(rows([0,100,100,300]),2)['method'],'NO_STABLE_INTEGER')
 
     def test_four_member_games(self):
         rng=random.Random(61999)

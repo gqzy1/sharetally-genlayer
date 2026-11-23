@@ -26,6 +26,8 @@ if (!keys) {
     await writeFile('.local/actors.json', stringify(keys), { mode: 0o600, flag: 'wx' });
 }
 const deployment = await load('artifacts/deployment.json');
+if (deployment?.protocol === 'sharetally-2')
+    throw Error('Use the milestone or single-operation acceptance commands for sharetally-2');
 if (!deployment || deployment.status !== 'DEPLOYED' || deployment.chainId !== 61999 || deployment.rpc !== 'https://studio.genlayer.com/api')
     throw Error('Run deploy and verify first');
 const actors = Object.fromEntries(Object.entries(keys).map(([name, key]) => { const account = createAccount(key as `0x${string}`); return [name, { address: account.address.toLowerCase() as Address, client: createClient({ chain: studionet, endpoint: deployment.rpc, account }) }]; }));

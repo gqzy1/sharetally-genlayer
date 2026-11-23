@@ -1,51 +1,21 @@
 # Operator procedure
 
-This release has a source-verified Stable deployment recorded in root `deployment.json`. No script runs a deployment as part of installation, tests, typechecking or schema compilation. New deployments are always explicit and never replace a recorded pending transaction.
+The active Stable deployment lives in [deployment.json](../deployment.json). Checked-in receipts from older releases are retained separately.
 
-## Before any deployment
+## Verify without signing
 
-1. Run local verification and inspect `docs/VALIDATION.md`.
-2. Use only Stable Studionet 61999 and the exact RPC and SDK in the release.
-3. Use a dedicated local test signer. Never commit keys, put them into documentation, echo them or reuse a website visitor's wallet as an operator.
-4. Run `npm run check:schema` for read-only compilation. This produces `evidence/schema.json` and sends no transaction.
+Run `npm ci`, `npm test`, `npm run typecheck` and `npm run verify:live`. The live verifier compares the exact local and deployed source, verifies each recorded transaction's destination, signer, calldata and final execution result, then reads back the five books at latest-final. It does not submit any transaction.
 
-## Deliberate deployment
+Use Python 3.12 and `genvm-linter==0.11.0` to run `genvm-lint check contracts/sharetally.py --json`. The contract declares its pinned Python SDK in its dependency header. `npm run check:schema` independently compiles the release on Stable Studionet (chain 61999) and writes `evidence/schema-v2.json`. These checks are read-only.
 
-Set `STUDIO_PRIVATE_KEY` privately in the operator environment and `ENABLE_DEPLOY=STABLE_STUDIONET_61999`, then run `npm run deploy` from the repository root. The constructor takes no arguments. Deployment is full consensus and attaches no application funds. Network funding/availability must be established before sending; zero cash cost is the target, not a promise that network policy never changes.
+## Deploy or write deliberately
 
-The script writes a SUBMITTING journal before broadcast. After a hash is returned it stores that hash and source digest. Restart resumes the same pending deployment. A surviving SUBMITTING record means the outcome is unknown: manually reconcile the signer history rather than deleting it and blindly redeploying. A finalized failure is retained for inspection, not silently replaced.
+Use a dedicated Stable Studionet test signer. Set `STUDIO_PRIVATE_KEY` in the local operator's environment and `ENABLE_DEPLOY=STABLE_STUDIONET_61999`, then run `npm run deploy`. The constructor takes no arguments. The deployment compares the exact contract source after finalized successful execution and writes its manifest to ignored `artifacts/`. Only the verified address and public receipts belong in the repository.
 
-After successful FINALIZED execution and majority agreement, the script reads the new source and compares the exact SHA256. Outputs remain in ignored `artifacts/`. Publish only source-verified manifest fields and sanitized real receipts. Do not invent an address, mutate a previous project's manifest or label compilation as deployment.
+The script journals its intent before signing and preserves the returned transaction hash. If the journal has intent but no hash, manually reconcile the signer history before trying again. If the original hash is present, resume the original operation. Keep finalized failures for inspection.
 
-## Lifecycle acceptance
+`npm run accept -- intent.json artifacts/unique-operation.json` submits one tagged `WriteIntent`. It requires a local signer, `ENABLE_WRITE=STABLE_STUDIONET_61999` and `artifacts/deployment.json`. Use a unique journal per operation. The client attaches zero application value and verifies that the Studio fee quote is below its testnet fee cap. A timeout preserves the hash.
 
-`npm run accept -- intent.json artifacts/unique-operation.json` submits exactly one tagged `WriteIntent`. It requires local `STUDIO_PRIVATE_KEY`, `ENABLE_WRITE=STABLE_STUDIONET_61999` and the verified `artifacts/deployment.json`. Use a unique journal per operation and named member signer. Successful or pending journals are resumed instead of resubmitted. An unknown submitting outcome stops for reconciliation. Scripts require one operator per journal path; do not run concurrent writers over the same file.
+The checked-in milestone records a rescue that reaches COMMITTED, a READY Shapley split, BLOCKED, REVIEW and CANCELLED cases, plus authorization and digest rejections. The optional write mode of `verify:milestone` resumes those operations only with their original local signers and journals. For a new independent manual acceptance use the single-operation command. Validate exact source, full consensus, finality, execution outcome and resulting state. The older acceptance scripts and artifacts describe the v1 deployment.
 
-Acceptance matrix:
-
-| Scenario | Expected finalized application result |
-| --- | --- |
-| Complete additive quote; seal, assess, each member approve | READY then COMMITTED, exact conserved charges |
-| Missing required fee/scope | REVIEW, no signable split |
-| Monotone costs with a subgroup objection | BLOCKED with exact coalition witness |
-| Nonmonotone quote | BLOCKED with subset/superset witness |
-| Exact core allocation whose minor-unit rounding creates objection | BLOCKED, rounded excess retained |
-| Nonmember, stale revision, wrong allocation digest, duplicate approval | Failed execution; unchanged state |
-| Member cancellation before last signature | CANCELLED, no later commitment |
-| RPC timeout or browser reload | Resume the original hash; no duplicate transaction |
-
-For every submitted operation preserve chain/RPC, input intent, signer, source hash, hash, complete raw receipt and matching latest-final readback. Distinguish business outcomes from execution success. Verify calldata, full consensus, finality, execution and majority agreement. Confirm all actual member signatures for commitment. Retain unsuccessful attempts honestly.
-
-The acceptance script is a one-operation building block, not a claim that this matrix has been run. The actual executed subset and hashes are recorded in `evidence/live.json`; do not infer that an unrecorded scenario was tested.
-
-## Reproduce and verify
-
-`ENABLE_WRITE=STABLE_STUDIONET_61999 npm run accept:live` runs a resumable, zero-cost multi-member acceptance using generated dedicated signers in ignored `.local/actors.json`. It requires the verified `artifacts/deployment.json`. Preserve this file and the original signers between restarts. Existing successful operations are skipped; pending hashes are resumed. Never delete journals to work around a timeout.
-
-`npm run verify:live` performs source verification, refetches each recorded receipt, checks intent bindings, validates expected failures and reads the current COMMITTED state. It does not deploy, sign or submit any transaction.
-
-The public static application is built by the Pages workflow from the existing release branch and main. No RPC secret, private key or paid service is needed. The Checks workflow runs backend, SDK, frontend, typechecking and production build checks. Portal submission remains a separate manual action.
-
-A fresh checkout can run `verify:live` without any signing key. Recorded actor addresses are audit data, not portable credentials: `accept:live` refuses a different key set over an existing journal. For another test, use the one-operation `accept` tool with a separate ignored journal and a namespace controlled by your own wallet; never delete committed evidence to bypass this guard.
-
-`npm run verify:browser -- observed-hashes.json` is also read-only. Its input names the observed owner/member addresses, the committed and cancelled tags, and six hashes (`seal`, `assess`, `approveOwner`, `approveMember`, `sealCancel`, `cancel`). It verifies the real source, receipts, independent approvals and final states. The published browser evidence additionally retains the original exported pending intents and intermediate readbacks.
+The Pages workflow builds and publishes the single static website. The Checks and browser workflows run without sending chain writes.

@@ -63,7 +63,7 @@ export function WalletProvider({ children }: {
             ethereum?: Provider;
         }).ethereum;
         if (!p)
-            throw Error('Install an EIP-1193 wallet, or use a free Studio session wallet');
+            throw Error('Install an EIP-1193 wallet, or use a Studio session wallet');
         const w = await connectWallet(p);
         await checkSource();
         setWallet(w);
@@ -150,9 +150,9 @@ export function WalletPanel() {
     return <section className="container" style={{ paddingBlock: '.75rem' }} aria-label="Live wallet and network">
  <div className="card card-padded"><strong>Stable Studionet · 61999 · {w.sourceReady ? 'SOURCE VERIFIED' : 'LIVE ACCESS LOCKED'}</strong>
  <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', marginTop: '.5rem' }}>
- {w.signer ? <><code data-testid="wallet-address">{w.signer}</code><button className="btn btn-secondary btn-sm" disabled={w.busy} onClick={w.disconnect}>Disconnect</button></> : <><button className="btn btn-primary btn-sm" onClick={() => void w.connect()}>Connect Wallet</button><button className="btn btn-secondary btn-sm" onClick={() => void w.session()}>Create Free Studio Session</button></>}
+ {w.signer ? <><code data-testid="wallet-address">{w.signer}</code><button className="btn btn-secondary btn-sm" disabled={w.busy} onClick={w.disconnect}>Disconnect</button></> : <><button className="btn btn-primary btn-sm" onClick={() => void w.connect()}>Connect Wallet</button><button className="btn btn-secondary btn-sm" onClick={() => void w.session()}>Create Studio Session</button></>}
  <button className="btn btn-ghost btn-sm" onClick={() => void w.checkSource().catch(() => { })}>Verify Source</button></div>
- <p style={{ fontSize: '.8rem', marginTop: '.5rem' }}>Session wallets sign real free Studio transactions. Keys stay in this tab’s memory and are lost on reload; use your own wallet for durable membership. Never fund this application.</p>
+ <p style={{ fontSize: '.8rem', marginTop: '.5rem' }}>Session wallets sign real Studio transactions with capped testnet fees. Keys stay in this tab’s memory and are lost on reload; use your own wallet for durable membership. Use testnet GEN only.</p>
  {w.error && <p role="alert">{w.error}</p>}
  {w.entries.filter(e => e.contract.toLowerCase() === release.address?.toLowerCase()).slice(-4).reverse().map(e => <div key={e.id} style={{ fontSize: '.8rem', overflowWrap: 'anywhere' }}>{e.intent.method} · {e.phase} · {e.pending ? <Link to={`/transactions/${e.pending.hash}`}>{e.pending.hash}</Link> : 'No hash yet — do not resubmit if broadcast outcome is unknown.'}</div>)}
  </div></section>;

@@ -1,39 +1,33 @@
 # ShareTally
 
-**Share a quote. Inspect the split. Sign the same plan.**
+ShareTally turns a shared-service quote for two to four participants into a cost allocation each member can inspect and sign. It is designed for shared print runs, exhibitors and workshop organizers who need to know whether any subgroup would pay less by ordering on its own.
 
-ShareTally helps two to four small exhibitors, print buyers or workshop organizers check a shared-service quote before committing to its cost allocation. A cheaper group total does not guarantee a split that every subgroup will accept. ShareTally exposes both the allocation and the exact subgroup objection.
+## From quotation to agreement
 
-## Workflow
+1. A participating organizer seals the quote and wallet roster. A named member requests assessment.
+2. GenLayer's leader and validators independently interpret the standalone price for every nonempty subgroup. Validators compare prices and independently audit source excerpts, subgroup scope and arithmetic.
+3. The contract calculates exact Shapley shares and checks the exact and rounded allocations against every subgroup's standalone price. If the benchmark fails, the contract searches for a nonnegative minor-unit split that preserves the total and satisfies every subgroup limit. If none exists the quote is blocked. Incomplete quotes go to review.
+4. In READY, each named wallet approves the digest of the same exact split. All signatures are required for COMMITTED. A member can cancel before commitment.
 
-1. One participating organizer seals the quotation, currency and named wallet roster.
-2. Any named member requests assessment. GenLayer's leader and validators independently interpret the complete standalone cost table for every nonempty member combination. Validators compare every decision and independently audit the leader's quotation anchors and arithmetic.
-3. Deterministic code computes exact Shapley shares, allocates minor-unit rounding by largest remainder and checks every coalition's incentive to exit. Missing terms produce REVIEW; nonmonotone prices or blocking coalitions produce BLOCKED.
-4. READY plans require every named wallet to approve the same allocation digest. The last distinct approval makes the plan COMMITTED. Any member may cancel before commitment.
+The [ShareTally workspace](https://gqzy1.github.io/sharetally-genlayer/) lets you compare the benchmark to the selected split, inspect an individual subgroup, and open audited examples from Stable Studionet. The example controls work offline. Live books use latest-final state and never substitute offline data.
 
-A quote charging 120 minor units per group plus 30 per participant gives three participants exact shares of 70 each. More complex quotes may produce a blocking coalition even when sharing lowers the grand total. Every computed result remains inspectable.
+## Stable Studionet
 
-## Release status
-
-The Intelligent Contract is deployed on Stable Studionet, with exact source-byte verification. The [application](https://gqzy1.github.io/sharetally-genlayer/) connects real wallets and reuses the source-verifying SDK for every write. Offline examples are explicitly separate from live books.
-
-| Release field | Value |
+| Field | Value |
 | --- | --- |
-| Contract | `0xfE63843CA44aD3089Ba18D4C0298c44431fa4379` |
-| Deployment transaction | `0xf31804d9b6d9a73939b8665beb38e73e237c44de32a463f8472637ce15ab2d75` |
-| Source SHA256 | `b5a98d59a3cea8a31829268b264e9bb284138021754e22a8e9bb0a67da16a135` |
+| Protocol | sharetally-2 |
+| Network | Stable Studionet, chain 61999 |
+| RPC | https://studio.genlayer.com/api |
+| Contract | [0x03741783AddBfb3710978Fe04E33519989B9Fc13](https://explorer-studio.genlayer.com/address/0x03741783AddBfb3710978Fe04E33519989B9Fc13) |
+| Deployment | [0x8cba7f338e0c6de7e6c66ccf13dbeabd7c69e166c49aa9960cd4a9a6cf0db306](https://explorer-studio.genlayer.com/tx/0x8cba7f338e0c6de7e6c66ccf13dbeabd7c69e166c49aa9960cd4a9a6cf0db306) |
+| Source SHA-256 | `65a7ed9a835fd611954de9ee39bc2d242a8a9d94fbc08a335b0a7585e91ba80c` |
+| Client SDK | `genlayer-js@2.0.0-rc.3` |
 
-[Validation and evidence](docs/VALIDATION.md) distinguish network observations, local tests and untested limits. The recorded workflow reaches COMMITTED with two independent wallets; three negative calls fail without changing state. [Open the committed allocation](https://gqzy1.github.io/sharetally-genlayer/#/books/0x495602d2a308b2da07a22acb5e48a2d684cf64e1/print-setup?mode=live).
+See the [milestone and evidence](docs/MILESTONE.md), [protocol](docs/PROTOCOL.md), [contract API](docs/API.md) and [operator guide](docs/OPERATIONS.md). The [v1 address](evidence/deployment-v1.json) and its [historical evidence](docs/VALIDATION.md) remain available.
 
-- Network: **Stable Studionet only**, chain **61999**.
-- RPC: `https://studio.genlayer.com/api`.
-- Exact SDK: `genlayer-js@1.1.8`.
-- Python 3.12+ and Node.js 22+.
-- No payment, custody, supplier signature, paid external API or central application backend.
+## Verify
 
-The [published browser acceptance](https://gqzy1.github.io/sharetally-genlayer/#/books/0xd3b57400fec692553ced402e5adff25f1f4419ad/published-print?mode=live) separately completed real seal, consensus assessment and two independent member approvals. [Browser evidence](evidence/browser-live.json) also verifies member cancellation on a second book.
-
-## Verify locally
+Use Node.js 22+ and Python 3.12+.
 
 ```sh
 npm ci
@@ -42,29 +36,11 @@ npm run typecheck
 npm ci --prefix frontend
 npm test --prefix frontend
 npm run build --prefix frontend
+npm run verify:live
 ```
 
-Optional SDK validation: `genvm-lint check contracts/sharetally.py --json` with `genvm-linter==0.11.0`. A newer-runner advisory does not change the source pin. `npm run check:schema` performs only read-only compilation against Stable Studionet.
+`npm run verify:live` uses the public RPC to check the deployed source, recorded final receipts and current final book states. It never signs or sends transactions. [Official GenVM lint and validation output](evidence/genvm-lint-v2.json), the [source checksum](evidence/source-v2.sha256) and [RPC schema result](evidence/schema-v2.json) are independently reproducible.
 
-## Files
+## Scope
 
-| Path | Purpose |
-| --- | --- |
-| `contracts/sharetally.py` | Complete deployable Intelligent Contract |
-| `sdk/types.ts` | Public domain, operation and transaction types |
-| `sdk/client.ts` | Wallet, source verification, reads, writes and resumable finality |
-| `docs/PRODUCT.md` | Product scope and responsibilities |
-| `docs/PROTOCOL.md` | State machine, consensus and arithmetic |
-| `docs/API.md` | Contract and application API |
-| `docs/INTERFACE.md` | Pages, states and integration requirements |
-| `docs/OPERATIONS.md` | Deployment and acceptance procedure |
-| `docs/VALIDATION.md` | Actual validation and evidence limits |
-| `tests/` | Scripted contract host, independent arithmetic oracle and SDK tests |
-| `examples/shared-print.json` | Explicitly synthetic offline input |
-| `deployment.json` | Source-verified Stable release configuration |
-
-## Trust boundaries
-
-Consensus interprets a sealed declaration; it does not authenticate the supplier, real-world price or authority of the organizer. Only public quotation metadata belongs on-chain. Quote text may be adversarial. Independent interpretation, schema restrictions and anchor auditing reduce risk but cannot eliminate shared model errors. Shapley allocation is one declared fairness convention. READY means this particular split has no blocking coalition within the complete supplied table; BLOCKED does not prove that no other allocation exists. Participants approve cost instructions, not a payment or enforceable purchase.
-
-Technical background: [GenLayer fit](https://docs.genlayer.com/developers/intelligent-contracts/when-to-use-genlayer), [independent equivalence verification](https://docs.genlayer.com/developers/intelligent-contracts/equivalence-principle).
+Only public quotation data belongs on-chain. Independent extraction and auditing can still share a common interpretation error. The contract supports complete monotone price tables and nonnegative minor-unit charges for up to four members. The fallback picks the first feasible vector in roster order and can be sensitive to that order. Approval records agreement to the allocation. Supplier authenticity, pricing enforceability, procurement and payment are outside the protocol.

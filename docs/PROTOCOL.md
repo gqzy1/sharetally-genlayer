@@ -1,4 +1,4 @@
-# Protocol sharetally-1
+# Protocol sharetally-2
 
 ## Immutable input and identity
 
@@ -46,7 +46,14 @@ The denominator is `n!`; the exact Shapley share is `a_i/n!` minor units. Effici
 
 Floor every exact share, then allocate remaining minor units to descending fractional remainders. Ties choose lower roster indices. Integer charges are nonnegative and sum exactly to `C(N)`. With `n≤4` and `C≤10^9`, all serialized arithmetic is safely below JavaScript's exact-integer limit.
 
-For every proper nonempty coalition `S`, compare both `Σ a_i` with `n! C(S)` and rounded `Σ charge_i` with `C(S)`. Either strict excess is a blocking witness. Store the coalition mask, standalone cost, exact sum numerator, rounded charge and positive excesses. READY requires no blocker in either representation. This does not search for another core allocation or prove an empty core.
+For every proper nonempty coalition `S`, compare both `Σ a_i` with `n! C(S)` and rounded `Σ charge_i` with `C(S)`. Either strict excess is a blocking witness. Store the coalition mask, standalone cost, exact sum numerator, rounded charge and positive excesses. A clear benchmark becomes the selected split (`SHAPLEY`). If either representation has a blocker, the solver checks whether some integer allocation satisfies:
+
+- Every charge is nonnegative and all charges sum to the grand-coalition cost.
+- Every proper nonempty coalition pays at most its standalone cost.
+
+The solver pads the roster to four coordinates with zero charges, eliminates the fourth coordinate using the total, and translates complementary sets into lower bounds. With the first charge fixed, the remaining constraints reduce to integer lower and upper bounds on the second charge, the third charge and their sum. Pairwise comparisons give an interval for the first charge. The algorithm chooses its smallest feasible integer, then the smallest feasible second and third charges. It recomputes and checks every coalition constraint on the resulting vector. The number of checks is bounded by the member count.
+
+A feasible fallback is recorded as `STABLE_INTEGER` and enters READY. An empty integer feasible region is recorded as `NO_STABLE_INTEGER` and enters BLOCKED. The original Shapley amounts and witnesses remain in either proof. The fallback is deterministic for the sealed roster order, which can affect the chosen vector.
 
 ## Signatures and integrity
 

@@ -63,5 +63,6 @@ test('4. Frontend package.json is independent and uses tsc --noEmit && vite buil
   const pkg = JSON.parse(fs.readFileSync(path.join(frontendRoot, 'package.json'), 'utf8'));
   assert.equal(pkg.name, 'sharetally-frontend');
   assert.equal(pkg.scripts.build, 'tsc --noEmit && vite build');
-  assert.equal(pkg.dependencies['genlayer-js'], '1.1.8');
+  const rootPackage = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+  assert.equal(pkg.dependencies['genlayer-js'], rootPackage.dependencies['genlayer-js']);
 });

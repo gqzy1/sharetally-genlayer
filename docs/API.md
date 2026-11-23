@@ -31,9 +31,9 @@ api.submit(intent, onPhase?): Promise<PendingWrite>
 api.resume(pending, onPhase?, timeoutMs?, intervalMs?): Promise<VerifiedWrite>
 ```
 
-`WriteIntent` is the tagged union in `sdk/types.ts`. `seal` accepts a `Specification`; the SDK serializes it as a string positional argument. Other methods carry owner-qualified book ID, exact current revision and, for approval, the stored allocation hash. All writes attach zero value and use `leaderOnly:false`. Live configuration must provide a verified deployed address and the release source SHA256; a NOT_DEPLOYED manifest or null address disables writes.
+`WriteIntent` is the tagged union in `sdk/types.ts`. `seal` accepts a `Specification`; the SDK serializes it as a string positional argument. Other methods carry owner-qualified book ID, exact current revision and, for approval, the stored allocation hash. All writes attach zero application value, carry a capped Stable testnet fee distribution and use `leaderOnly:false`. Live configuration must provide a verified deployed address and the release source SHA256; a NOT_DEPLOYED manifest or null address disables writes.
 
-`submit` performs source, network and zero-gas-price checks, then requests the intended write. Persist its returned PendingWrite immediately. `resume` only polls the existing hash and reads state. It never sends another transaction. Timeout or a readback problem retains the pending record. The application must also persist a SUBMITTING marker before calling submit, so a browser crash before receiving a hash requires manual reconciliation instead of blind retry.
+`submit` performs source, network, fee cap and zero-gas-price checks, then requests the intended write. Persist its returned PendingWrite immediately. `resume` only polls the existing hash and reads state. It never sends another transaction. Timeout or a readback problem retains the pending record. The application must also persist a SUBMITTING marker before calling submit, so a browser crash before receiving a hash requires manual reconciliation instead of blind retry.
 
 ## Business data
 

@@ -1,0 +1,10 @@
+{
+  "protocol": "sharetally-1",
+  "status": "DEPLOYED",
+  "chainId": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "sdk": "genlayer-js@1.1.8",
+  "address": "0xfE63843CA44aD3089Ba18D4C0298c44431fa4379",
+  "sourceSha256": "b5a98d59a3cea8a31829268b264e9bb284138021754e22a8e9bb0a67da16a135",
+  "deployTransaction": "0xf31804d9b6d9a73939b8665beb38e73e237c44de32a463f8472637ce15ab2d75"
+}

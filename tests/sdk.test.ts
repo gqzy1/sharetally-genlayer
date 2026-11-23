@@ -79,5 +79,5 @@ test('SDK numeric receipt status uses official mapping and never promotes ACCEPT
 test('nonzero gas price stops zero-cost writes',async()=>{
  const {assertZeroCost}=await import('../sdk/client.js');
  const client={getChainId:async()=>61999,request:async()=> '0x1'} as unknown as Client;
- await assert.rejects(assertZeroCost(client),/requires payment/);
+ await assert.rejects(assertZeroCost(client),/zero EVM gas price/);
 });

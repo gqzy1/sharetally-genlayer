@@ -19,11 +19,23 @@ export function readClient():Client{return createClient({chain:studionet,endpoin
 export async function assertNetwork(client:Client):Promise<void>{
   if(studionet.id!==CHAIN_ID || await client.getChainId()!==CHAIN_ID)fail('WRONG_NETWORK','Stable Studionet 61999 required');
 }
-/** Stable Studio is free; fail closed if the RPC starts quoting a fee. */
+/** Require zero EVM gas price. The separate consensus fee is capped by studioFees. */
 export async function assertZeroCost(client:Client):Promise<void>{
   await assertNetwork(client);
   const gasPrice = await client.request({method:'eth_gasPrice'});
-  if(BigInt(gasPrice as string)!==0n)fail('REJECTED','Network requires payment; no transaction sent');
+  if(BigInt(gasPrice as string)!==0n)fail('REJECTED','Expected zero EVM gas price; no transaction sent');
+}
+const MAX_STUDIO_FEE = 10000000000000000n;
+export async function studioFees(client:Client) {
+  await assertZeroCost(client);
+  const config = await client.request({method:'sim_getFeeConfig'} as never) as {
+    enabled: boolean;
+    defaultFees: {distribution: NonNullable<Parameters<Client['deployContract']>[0]['fees']>['distribution'];feeValue:string};
+  };
+  if(!config.enabled) return undefined;
+  const feeValue = BigInt(config.defaultFees.feeValue);
+  if(feeValue <= 0n || feeValue > MAX_STUDIO_FEE)fail('REJECTED','Stable testnet fee exceeds the configured cap');
+  return {distribution:config.defaultFees.distribution,feeValue};
 }
 export function guardedProvider(provider:NonNullable<Provider>,signer:Address):NonNullable<Provider>{
   return new Proxy(provider, {get(target,property){
@@ -31,7 +43,7 @@ export function guardedProvider(provider:NonNullable<Provider>,signer:Address):N
       if(['eth_sendTransaction','eth_signTransaction','personal_sign','eth_signTypedData_v4'].includes(request.method)){
         if(Number(await target.request({method:'eth_chainId'}))!==CHAIN_ID)fail('WRONG_NETWORK','Wallet moved off Stable Studionet');
         const tx=(request.params as Record<string,unknown>[]|undefined)?.[0];
-        if(request.method==='eth_sendTransaction' && (!tx || BigInt(String(tx.value??0))!==0n || BigInt(String(tx.gasPrice??-1))!==0n))fail('REJECTED','Only explicit zero-cost transactions are permitted');
+        if(request.method==='eth_sendTransaction' && (!tx || (BigInt(String(tx.value??0))<0n||BigInt(String(tx.value??0))>MAX_STUDIO_FEE) || BigInt(String(tx.gasPrice??-1))!==0n))fail('REJECTED','Only capped Stable testnet fees with zero gas price are permitted');
         const accounts=await target.request({method:'eth_accounts'}) as string[];
         if(lower(accounts[0])!==lower(signer))fail('SIGNER_CHANGED','Wallet account changed before signing');
       }
@@ -72,7 +84,7 @@ export async function verifySource(client:Client,contract:Address,expectedSha256
   if(!/^0x[0-9a-fA-F]{40}$/.test(contract)||/^0x0{40}$/i.test(contract))fail('NOT_DEPLOYED','No deployed contract configured');
   if(!/^[0-9a-f]{64}$/.test(expectedSha256))fail('SOURCE_MISMATCH','Missing release source hash');
   const code=await client.getContractCode(contract);
-  // SDK 1.1.8 returns contract source as text. Do not normalize line endings or trim.
+  // The SDK returns contract source as text. Do not normalize line endings or trim.
   const bytes=new TextEncoder().encode(code);
   const actual=Array.from(new Uint8Array(await globalThis.crypto.subtle.digest('SHA-256',bytes))).map(v=>v.toString(16).padStart(2,'0')).join('');
   if(actual!==expectedSha256)fail('SOURCE_MISMATCH','Deployed bytes differ from this release');
@@ -95,15 +107,17 @@ export function checkFinalReceipt(raw:unknown,hash:TxHash):void{
   const r=obj(raw);
   if(receiptStatus(r)!=='FINALIZED')fail('UNVERIFIED_RECEIPT','Receipt is not FINALIZED',hash);
   if(lower(r.hash??r.txId)!==lower(hash))fail('UNVERIFIED_RECEIPT','Receipt hash differs',hash);
+  const receiptList=obj(r.consensus_data).leader_receipt;
+  const leaders=Array.isArray(receiptList)?receiptList.map(obj).filter(v=>v.mode==='leader'):[];
+  const leader=leaders.at(-1);
   if('txExecutionResultName' in r){
-    if(r.txExecutionResultName!=='FINISHED_WITH_RETURN')fail('TX_FAILED','Execution failed',hash);
-    if(r.resultName!=='MAJORITY_AGREE')fail('CONSENSUS_FAILED','Majority agreement missing',hash);
-    if(obj(r.txDataDecoded).leaderOnly!==false)fail('UNVERIFIED_RECEIPT','Full consensus missing',hash);
+    if(r.txExecutionResultName!=='FINISHED_WITH_RETURN' || (Array.isArray(receiptList) && leader?.execution_result!=='SUCCESS'))fail('TX_FAILED','Execution failed',hash);
+    if((r.resultName??r.result_name)!=='MAJORITY_AGREE')fail('CONSENSUS_FAILED','Majority agreement missing',hash);
+    const leaderOnly = obj(r.txDataDecoded).leaderOnly ?? r.leader_only;
+    if(leaderOnly!==false || (r.execution_mode!==undefined && r.execution_mode!=='NORMAL'))
+      fail('UNVERIFIED_RECEIPT','Full consensus missing',hash);
   }else{
-    // Stable Studio returns the legacy envelope through SDK 1.1.8.
-    const consensus=obj(r.consensus_data);
-    const leaders=Array.isArray(consensus.leader_receipt)?consensus.leader_receipt.map(obj).filter(v=>v.mode==='leader'):[];
-    const leader=leaders.at(-1);
+    // Stable Studio returns the legacy envelope for RPC readbacks.
     if(!leader || leader.execution_result!=='SUCCESS')fail('TX_FAILED','Leader execution failed or absent',hash);
     if((r.result!==undefined && r.result!==6) || (r.resultName!==undefined && r.resultName!=='MAJORITY_AGREE') || (r.result===undefined && r.resultName===undefined))fail('CONSENSUS_FAILED','Majority agreement missing',hash);
     if(r.leader_only!==false || r.execution_mode!=='NORMAL')fail('UNVERIFIED_RECEIPT','Full consensus missing',hash);
@@ -114,7 +128,11 @@ export function receiptCall(raw:unknown):Record<string,unknown>{
   if(decoded.callData)return obj(decoded.callData);
   const encoded=obj(obj(r.data).calldata).base64;
   if(typeof encoded!=='string')return {};
-  try{return obj(abi.calldata.decode(Uint8Array.from(atob(encoded),c=>c.charCodeAt(0))))}catch{return {}}
+  try{
+    const call=obj(abi.calldata.decode(Uint8Array.from(atob(encoded),c=>c.charCodeAt(0))));
+    if(typeof call['']==='string' && call.method===undefined)return {...call,method:call['']};
+    return call;
+  }catch{return {}}
 }
 export function checkReceipt(raw:unknown,pending:PendingWrite):void{
   checkFinalReceipt(raw,pending.hash);checkIntentBinding(raw,pending);
@@ -124,7 +142,8 @@ export function checkIntentBinding(raw:unknown,pending:PendingWrite):void{
   if(lower(r.hash??r.txId)!==lower(pending.hash))fail('UNVERIFIED_RECEIPT','Receipt hash differs',pending.hash);
   if(lower(r.from_address??r.sender)!==lower(pending.signer)||lower(r.to_address??r.recipient)!==lower(pending.contract))
     fail('UNVERIFIED_RECEIPT','Receipt signer or destination differs',pending.hash);
-  if(r.value!==undefined && String(r.value)!=='0')fail('UNVERIFIED_RECEIPT','Unexpected attached value',pending.hash);
+  const userValue=obj(r.data).user_value??r.value;
+  if(userValue!==undefined && String(userValue)!=='0')fail('UNVERIFIED_RECEIPT','Unexpected attached value',pending.hash);
   const call=receiptCall(raw);
   if(call.method!==pending.intent.method || canonical(call.args)!==canonical(argsFor(pending.intent)))
     fail('UNVERIFIED_RECEIPT','Receipt calldata differs from submitted intent',pending.hash);
@@ -166,11 +185,11 @@ export class ShareTallyApi {
     const frozen=structuredClone(intent);
     try{
       await verifySource(this.client,this.contract,this.sourceSha256);
-      await assertZeroCost(this.client);
+      const fees=await studioFees(this.client);
       const accounts=await this.client.getAddresses();
       if(lower(accounts[0])!==lower(this.signer))fail('SIGNER_CHANGED','Reconnect the selected wallet');
       onPhase('AWAITING_SIGNATURE');
-      const hash:unknown=await this.client.writeContract({address:this.contract,functionName:frozen.method,args:argsFor(frozen),value:0n,leaderOnly:false});
+      const hash:unknown=await this.client.writeContract({address:this.contract,functionName:frozen.method,args:argsFor(frozen),value:0n,leaderOnly:false,...(fees?{fees}:{})});
       if(typeof hash!=='string'||!/^0x[0-9a-fA-F]{64}$/.test(hash))return fail('BAD_RESPONSE','Missing transaction hash; reconcile wallet before retrying');
       const pending:PendingWrite={hash:hash as TxHash,signer:this.signer,contract:this.contract,bookId:frozen.method==='seal'?this.signer.toLowerCase()+':'+frozen.tag:frozen.bookId,intent:frozen,submittedAt:new Date().toISOString()};
       onPhase('SUBMITTED');return pending;

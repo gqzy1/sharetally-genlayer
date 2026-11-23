@@ -1,6 +1,6 @@
 /** Public transaction evidence excludes validator configuration and duplicate byte arrays. */
 export function publicReceipt(r: any) {
-    const selected: any = Object.fromEntries(['hash', 'from_address', 'to_address', 'status', 'statusName', 'result', 'resultName', 'leader_only', 'execution_mode', 'value', 'txExecutionResultName', 'txDataDecoded'].filter(k => r[k] !== undefined).map(k => [k, r[k]]));
+    const selected: any = Object.fromEntries(['hash', 'from_address', 'to_address', 'status', 'statusName', 'result', 'resultName', 'result_name', 'fees', 'leader_only', 'execution_mode', 'value', 'txExecutionResultName', 'txDataDecoded'].filter(k => r[k] !== undefined).map(k => [k, r[k]]));
     selected.data = { ...r.data };
     delete selected.data.contract_code;
     const leaders = r.consensus_data?.leader_receipt;

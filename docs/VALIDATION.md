@@ -1,4 +1,6 @@
-# Validation and evidence
+# Historical validation · sharetally-1
+
+The current release is documented in [the milestone and network evidence](MILESTONE.md).
 
 Only `evidence/receipts/` and recorded live operations constitute network transaction evidence. Authored fixtures and scripted hosts are explicitly offline.
 
